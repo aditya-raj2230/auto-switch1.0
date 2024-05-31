@@ -3,7 +3,9 @@ import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <nav className={`flex flex-row relative  z-30 justify-between px-10 py-2 w-screen`}>
+    <nav
+      className={`flex flex-row relative  z-30 justify-between px-10 py-2 w-screen`}
+    >
       <Link href="/">
         <Image
           src="/image.png"
@@ -14,19 +16,35 @@ const Navbar = () => {
         />
       </Link>
       <ul className="hidden h-full gap-12 lg:flex m-4">
-        <Link
-          className="regular-16 text-gray-500 flex flex-row justify-center cursor-pointer hover:font-bold transition-all pb-1.5"
-          href="/signup"
-          label="sign up"
-          key="signup"
-        >
-          Sign Up{" "}
-        </Link>
-        <Link href="/login" label="login" key="login" className="regular-16 text-gray-500 flex flex-row justify-center cursor-pointer hover:font-bold transition-all pb-1.5">
-          Login{" "}
-        </Link>
-      </ul> 
-      <Image src="/menu.png" alt="menu" height={15}  width={25} className="inline-block cursor-pointer lg:hidden"/>
+        <button className="bg-white border-2 border-black  boder-2 hover:border-black  hover:text-white rounded-full  hover:bg-black pr-5 pl-5">
+          {" "}
+          <Link
+            className="regular-16 text-black  hover:text-white    flex flex-row justify-center cursor-pointer hover:font-bold  "
+            href="/signup"
+            label="sign up"
+            key="signup"
+          >
+            Sign Up{" "}
+          </Link>
+        </button>
+        <button className="bg-white border-2 border-black  boder-2 hover:border-black  hover:text-white rounded-full  hover:bg-black pr-5 pl-5">
+          <Link
+            href="/login"
+            label="login"
+            key="login"
+            className="regular-16 text-black  hover:text-white    flex flex-row justify-center cursor-pointer hover:font-bold  "
+          >
+            Login{" "}
+          </Link>
+        </button>
+      </ul>
+      <Image
+        src="/menu.png"
+        alt="menu"
+        height={15}
+        width={25}
+        className="inline-block cursor-pointer lg:hidden"
+      />
     </nav>
   );
 };
