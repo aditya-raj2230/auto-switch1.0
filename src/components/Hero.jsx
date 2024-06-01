@@ -4,7 +4,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 const Hero = () => {
   return (
-    <section className="flex flex-row xl:flex-col gap-10">
+    <section className="flex flex-row xl:flex-col gap-10 m-10">
       <div className="hero-section w-screen text-center py-0 h-full lg:flex justify-around gap-0 flex-row hidden ">
         <h1 className="text-4xl font-bold mb-4 flex flex-col justify-center  m-20  items-center lg:ml-96">
           Drive your <span>Dream Car</span>
