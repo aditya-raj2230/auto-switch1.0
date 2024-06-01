@@ -48,7 +48,7 @@ export default function SignupForm() {
       setEmail('');
       setPassword('');
       setName('');
-      router.push('/auth/login')
+      router.push('/')
 
     } catch (error) {
       console.error(error);
