@@ -6,12 +6,14 @@ import { auth } from "@/app/firebase/config";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from "next/navigation";
 
 
 export default function SignupForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router= useRouter()
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
@@ -19,6 +21,7 @@ export default function SignupForm() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log("Signed in with Google:", user);
+      router.push('/')
     } catch (error) {
       console.error("Error signing in with Google:", error);
       toast.error('An error occurred with Google sign-in. Please try again later.');
@@ -40,12 +43,13 @@ export default function SignupForm() {
     }
 
     try {
-      const res = await createUserWithEmailAndPassword(email, password);
-      console.log({ res });
+      await createUserWithEmailAndPassword(email, password);
+      
       setEmail('');
       setPassword('');
       setName('');
-      toast.success('User created successfully');
+      router.push('/auth/login')
+
     } catch (error) {
       console.error(error);
       if (error.code === 'auth/email-already-in-use') {
