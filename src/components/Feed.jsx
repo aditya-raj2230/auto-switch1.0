@@ -1,11 +1,15 @@
-import React from 'react'
+// pages/profile.js
 
+// Adjust the path as needed
 const Feed = () => {
+
   return (
     <div>
-      HEllo adi
+      <h2>Welcome adi</h2>
+      {/* Your feed content here */}
     </div>
-  )
-}
+  );
+};
 
-export default Feed
+export default Feed;
+
