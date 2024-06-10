@@ -1,12 +1,10 @@
 "use client";
 import { useState } from "react";
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { useCreateUserWithEmailAndPassword, useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth, db } from "@/app/firebase/config";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-// import { ToastContainer, toast } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
+
 import { useRouter } from "next/navigation";
-import { collection, addDoc } from "firebase/firestore";
 
 export default function SignupForm() {
   const [name, setName] = useState("");
@@ -29,41 +27,22 @@ export default function SignupForm() {
 
   const [createUserWithEmailAndPassword] =
     useCreateUserWithEmailAndPassword(auth);
+  const [loginUserWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault(e);
-    if (!email || !password) {
-      // toast.error('Email and password are required');
-      return;
-    }
-
-    if (password.length < 6) {
-      // toast.error('Password must be at least 6 characters long');
-      return;
-    }
 
     try {
-     
       // Create user with email and password
       await createUserWithEmailAndPassword(auth, email, password);
-      console.log("Document written with ID: ");
-      // Add user details to Firestore
-      const docRef = await addDoc(collection(db, "Users"), {
-        name: name,
-        email: email,
-        profilePic: "",
-        bio: ""
-      });
-
-      console.log("Document written with ID: ", docRef.id);
+      await loginUserWithEmailAndPassword(email, password);
 
       // Clear input fields
-      setEmail('');
-      setPassword('');
-      setName('');
-
+      setEmail("");
+      setPassword("");
+      setName("");
+      router.push("/");
       // Redirect to home page
-      router.push('/');
     } catch (error) {
       console.error(error);
     }
@@ -129,7 +108,6 @@ export default function SignupForm() {
       >
         Google
       </button>
-      
     </form>
   );
 }
