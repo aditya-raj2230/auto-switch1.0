@@ -32,7 +32,13 @@ const Navbar2 = () => {
   return (
     <nav className="flex flex-row top-0 z-30 justify-between px-10 py-2 w-screen sticky bg-white">
       <Link href="/">
-        <Image src="/image.png" alt="logo" width={200} height={100} className="m-0 p-0" />
+        <Image
+          src="/image.png"
+          alt="logo"
+          width={200}
+          height={100}
+          className="m-0 p-0"
+        />
       </Link>
       <ul className="hidden h-full gap-12 lg:flex m-4">
         {user ? (
@@ -41,21 +47,27 @@ const Navbar2 = () => {
               onClick={handleLogout}
               className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2"
             >
-              Logout
+              Logout {user?.email || "User"}
             </button>
           </li>
         ) : (
           <>
             <li>
               <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2">
-                <Link href="/auth/signup" className="regular-16 text-black group-hover:text-white">
+                <Link
+                  href="/auth/signup"
+                  className="regular-16 text-black group-hover:text-white"
+                >
                   Sign Up
                 </Link>
               </button>
             </li>
             <li>
               <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2">
-                <Link href="/auth/login" className="regular-16 text-black group-hover:text-white">
+                <Link
+                  href="/auth/login"
+                  className="regular-16 text-black group-hover:text-white"
+                >
                   Login
                 </Link>
               </button>
@@ -77,7 +89,10 @@ const Navbar2 = () => {
             isMenuOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
-          <button className="absolute top-4 right-4 text-3xl" onClick={toggleMenu}>
+          <button
+            className="absolute top-4 right-4 text-3xl"
+            onClick={toggleMenu}
+          >
             &times;
           </button>
           <ul className="flex flex-col items-center gap-4 mt-8">
@@ -87,21 +102,27 @@ const Navbar2 = () => {
                   onClick={handleLogout}
                   className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2"
                 >
-                  Logout
+                  Logout {user?.email || "User"}
                 </button>
               </li>
             ) : (
               <>
                 <li>
                   <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2">
-                    <Link href="/auth/signup" className="regular-16 text-black group-hover:text-white">
+                    <Link
+                      href="/auth/signup"
+                      className="regular-16 text-black group-hover:text-white"
+                    >
                       Sign Up
                     </Link>
                   </button>
                 </li>
                 <li>
                   <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2">
-                    <Link href="/auth/login" className="regular-16 text-black group-hover:text-white">
+                    <Link
+                      href="/auth/login"
+                      className="regular-16 text-black group-hover:text-white"
+                    >
                       Login
                     </Link>
                   </button>

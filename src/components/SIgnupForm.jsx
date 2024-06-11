@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useCreateUserWithEmailAndPassword, useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
-import { auth, db } from "@/app/firebase/config";
+import { auth } from "@/app/firebase/config";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 import { useRouter } from "next/navigation";
@@ -27,15 +27,16 @@ export default function SignupForm() {
 
   const [createUserWithEmailAndPassword] =
     useCreateUserWithEmailAndPassword(auth);
-  const [loginUserWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault(e);
 
     try {
       // Create user with email and password
-      await createUserWithEmailAndPassword(auth, email, password);
-      await loginUserWithEmailAndPassword(email, password);
+      await createUserWithEmailAndPassword(auth, email, password)
+
+      
+
 
       // Clear input fields
       setEmail("");
