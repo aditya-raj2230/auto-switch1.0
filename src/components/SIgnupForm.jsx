@@ -1,13 +1,14 @@
 "use client";
 import { useState } from "react";
 import { useCreateUserWithEmailAndPassword, useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
-import { auth } from "@/app/firebase/config";
+import { auth, db } from "@/app/firebase/config"; // Ensure db is imported from your Firebase config
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-
+import { doc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 
 export default function SignupForm() {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
@@ -25,25 +26,31 @@ export default function SignupForm() {
     }
   };
 
-  const [createUserWithEmailAndPassword] =
-    useCreateUserWithEmailAndPassword(auth);
+  const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
 
   const handleSubmit = async (e) => {
-    e.preventDefault(e);
-
+    e.preventDefault();
     try {
       // Create user with email and password
-      await createUserWithEmailAndPassword(auth, email, password)
+      const userCredential = await createUserWithEmailAndPassword(email, password);
+      const user = userCredential.user;
 
-      
-
+      // Add user info to Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        createdAt: new Date()
+      });
 
       // Clear input fields
+      setFirstName("");
+      setLastName("");
       setEmail("");
       setPassword("");
-      setName("");
-      router.push("/");
+      
       // Redirect to home page
+      router.push('/');
     } catch (error) {
       console.error(error);
     }
@@ -52,25 +59,31 @@ export default function SignupForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Name
+        <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+          First Name
         </label>
         <input
           type="text"
-          id="name"
+          id="firstName"
           className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
         />
       </div>
       <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+          Last Name
+        </label>
+        <input
+          type="text"
+          id="lastName"
+          className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-500 focus:border-gray-500"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
           Email
         </label>
         <input
@@ -82,10 +95,7 @@ export default function SignupForm() {
         />
       </div>
       <div>
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
           Password
         </label>
         <input

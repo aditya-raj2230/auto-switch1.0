@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "@/app/firebase/config";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { ToastContainer, toast } from 'react-toastify';
+
 import { useRouter } from "next/navigation";
 
 
@@ -21,7 +21,7 @@ export default function LoginForm() {
       router.push('/')
     } catch (error) {
       console.error("Error signing in with Google:", error);
-      toast.error('An error occurred with Google sign-in. Please try again later.');
+      
     }
   };
 
@@ -29,29 +29,19 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast.error('Email and password are required');
-      return;
-    }
+  
 
 
     try {
-      await loginUserWithEmailAndPassword(email, password);
+      const userCredential = await loginUserWithEmailAndPassword(email, password);
+      const user = userCredential.user;
       router.push('/')
       setEmail('');
       setPassword('');
       
     } catch (error) {
       console.error(error);
-      if (error.code === 'auth/email-already-in-use') {
-        toast.error('Email already in use. Please try another email.');
-      } else if (error.code === 'auth/invalid-email') {
-        toast.error('Invalid email. Please check your email and try again.');
-      } else if (error.code === 'auth/weak-password') {
-        toast.error('Password is too weak. Please use a stronger password.');
-      } else {
-        toast.error('An error occurred. Please try again later.');
-      }
+    
     }
   };
 
@@ -67,7 +57,6 @@ export default function LoginForm() {
       </div>
       <button type="submit" className="w-full py-2 px-4 bg-gray-900 text-white rounded-md shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Login</button>
       <button type="button" onClick={signInWithGoogle} className="w-full py-2 px-4 bg-gray-200 text-gray-900 rounded-md shadow-sm border-gray-900 border-2 hover:bg-white focus:outline-none">Google</button>
-      <ToastContainer />
     </form>
   );
 }
