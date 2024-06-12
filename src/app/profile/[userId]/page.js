@@ -1,19 +1,30 @@
 'use client'
-
 import React, { useState, useEffect } from "react";
 import { collection, query, orderBy, limit, startAfter, getDocs } from "firebase/firestore";
 import { useRouter } from "next/navigation"; // Correct router import
 import { db } from "@/app/firebase/config";
+import Profile from "@/components/Profile";
 
-const Profile = () => {
+const UserProfile = () => {
   const [users, setUsers] = useState([]);
   const [lastVisible, setLastVisible] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter(); // Initialize useRouter
+  
+  
+ 
 
   useEffect(() => {
-    fetchUsers();
+    // Ensure userId is available before fetching users
+    const userId = router.query;
+    if(!userId) {
+      return <></>;
+    }
+    if (userId) {
+      fetchUsers();
+    }
   }, []);
+
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -23,7 +34,7 @@ const Profile = () => {
       const querySnapshot = await getDocs(q);
       const userList = [];
       querySnapshot.forEach((doc) => {
-        userList.push({ id: doc.id, ...doc.data() });
+        userList.push({ id: doc.id, userId: doc.data().userId, ...doc.data() });
       });
       setUsers(userList);
       setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
@@ -42,7 +53,7 @@ const Profile = () => {
       const querySnapshot = await getDocs(q);
       const userList = [];
       querySnapshot.forEach((doc) => {
-        userList.push({ id: doc.id, ...doc.data() });
+        userList.push({ id: doc.id, userId: doc.data().userId, ...doc.data() });
       });
       setUsers((prevUsers) => [...prevUsers, ...userList]);
       setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
@@ -53,7 +64,7 @@ const Profile = () => {
   };
 
   const handleProfileClick = (userId) => {
-  
+    router.push(`/profile/${userId}`);
   };
 
   return (
@@ -74,6 +85,7 @@ const Profile = () => {
             />
             <div>
               <p className="text-lg font-semibold text-center">{user.firstName} {user.lastName}</p>
+              <p className="text-sm text-gray-600">{user.userId}</p> {/* Display userId */}
             </div>
           </div>
         ))}
@@ -89,8 +101,9 @@ const Profile = () => {
           </button>
         </div>
       )}
+      <Profile />
     </div>
   );
 };
 
-export default Profile;
+export default UserProfile;
