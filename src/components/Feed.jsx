@@ -28,7 +28,9 @@ const Feed = () => {
   const [userId, setUserId] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null); // Updated state to hold the selected user
   const { followingList, setFollowingList } = useFollow(); // Use FollowContext
+  const [showModal,setShowModal] = useState(false)
 
+  const [isGray, setIsGray] = useState(false);
   const router = useRouter();
 
   const handleFollow = async (targetUserId) => {
@@ -38,7 +40,9 @@ const Feed = () => {
 
     try {
       await updateDoc(userDocRef, {
-        following: isFollowing ? arrayRemove(targetUserId) : arrayUnion(targetUserId),
+        following: isFollowing
+          ? arrayRemove(targetUserId)
+          : arrayUnion(targetUserId),
         followingCount: increment(isFollowing ? -1 : 1),
       });
 
@@ -49,7 +53,9 @@ const Feed = () => {
 
       // Update local state
       setFollowingList((prevList) =>
-        isFollowing ? prevList.filter((id) => id !== targetUserId) : [...prevList, targetUserId]
+        isFollowing
+          ? prevList.filter((id) => id !== targetUserId)
+          : [...prevList, targetUserId]
       );
     } catch (error) {
       console.error("Error updating follow status:", error);
@@ -188,6 +194,20 @@ const Feed = () => {
     return <div>Loading...</div>;
   }
 
+
+  const handleCopy =()=>{
+    const urlInput = document.getElementById('urlInput');
+    urlInput.select();
+    urlInput.setSelectionRange(0, 99999); // For mobile devices
+    document.execCommand('copy');
+    alert('URL copied to clipboard');
+    setShowModal(false)
+    setIsGray(true)
+     setTimeout(() => {
+      setIsGray(false);
+    }, 5000);
+  }
+
   return (
     <div>
       <div className="flex justify-end mt-4 mr-8">
@@ -197,6 +217,33 @@ const Feed = () => {
         >
           My Profile
         </button>
+        
+      {showModal && (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-30">
+          <div className="bg-white p-6 rounded shadow-md">
+            <p className="mb-4">Share this URL with friends:</p>
+            <input
+              type="text"
+              id="urlInput"
+              value="localhost:3000"
+              readOnly
+              className="border p-2 mb-4 w-full"
+            />
+            <button
+              className="px-4 py-2 bg-green-500 text-white rounded mr-2"
+              onClick={handleCopy}
+            >
+              Copy
+            </button>
+            <button
+              className="px-4 py-2 bg-red-500 text-white rounded"
+              onClick={() => setShowModal(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       </div>
       {userData && (
         <div
@@ -242,18 +289,24 @@ const Feed = () => {
               </div>
               <div className="mb-2">
                 <strong>Joined:</strong>{" "}
-                {new Date(userData.createdAt.seconds * 1000).toLocaleDateString()}
+                {new Date(
+                  userData.createdAt.seconds * 1000
+                ).toLocaleDateString()}
               </div>
               {userId !== selectedUserId && ( // Render button only if userId matches selectedUserId
-              <button
-                className={`bg-blue-500 text-white px-6 py-2 absolute right-0 bottom-10 rounded hover:bg-blue-700 ${
-                  followingList.includes(selectedUserId) ? "bg-gray-600 hover:bg-gray-700" : ""
-                }`}
-                onClick={() => handleFollow(selectedUserId)}
-              >
-                {followingList.includes(selectedUserId) ? "Unfollow" : "Follow"}
-              </button>
- )}
+                <button
+                  className={`bg-blue-500 text-white px-6 py-2 absolute right-0 bottom-10 rounded hover:bg-blue-700 ${
+                    followingList.includes(selectedUserId)
+                      ? "bg-gray-600 hover:bg-gray-700"
+                      : ""
+                  }`}
+                  onClick={() => handleFollow(selectedUserId)}
+                >
+                  {followingList.includes(selectedUserId)
+                    ? "Unfollow"
+                    : "Follow"}
+                </button>
+              )}
               {userId === selectedUserId && ( // Render button only if userId matches selectedUserId
                 <button
                   className="bg-blue-500 text-white px-6 py-2 absolute right-0 bottom-10 rounded hover:bg-blue-700"
@@ -267,8 +320,14 @@ const Feed = () => {
         </div>
       )}
 
-      <div className="max-w-5xl mx-auto my-10 p-8 bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold mb-6">User Profiles</h1>
+      <div className="max-w-5xl mx-auto my-10 p-8 bg-white rounded-lg shadow-md relative">
+        <h1 className="text-2xl font-bold mb-6">Add Friends</h1>
+        <button
+          className={`px-4 py-2 rounded absolute right-8 top-6 ${isGray ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-700'} text-white`}
+          onClick={() => setShowModal(true)}
+        >
+          Invite Friend
+        </button>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {users
             .filter((user) => user.id !== userId) // Filter out the logged-in user
@@ -289,7 +348,9 @@ const Feed = () => {
                   </p>
                   <button
                     className={`bg-blue-500 text-white px-4 py-2 mt-4 rounded hover:bg-blue-700 ${
-                      followingList.includes(user.id) ? "bg-gray-600 hover:bg-gray-700" : ""
+                      followingList.includes(user.id)
+                        ? "bg-gray-600 hover:bg-gray-700"
+                        : ""
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
