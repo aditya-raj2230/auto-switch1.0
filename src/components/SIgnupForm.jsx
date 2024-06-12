@@ -40,7 +40,10 @@ export default function SignupForm() {
         firstName: firstName,
         lastName: lastName,
         email: email,
-        createdAt: new Date()
+        createdAt: new Date(),
+        bio:"lorem",
+        followers:0,
+        following:0
       });
 
       // Clear input fields
