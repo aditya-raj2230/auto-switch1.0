@@ -292,13 +292,13 @@ const Feed = () => {
                   <p className="text-gray-900 font-bold text-xl">
                     {userData.followerCount}
                   </p>
-                  <p className="text-gray-600 text-sm">Followers</p>
+                  <p className="text-gray-600 text-xl">Followers</p>
                 </div>
                 <div>
                   <p className="text-gray-900 font-bold text-xl">
                     {userData.followingCount}
                   </p>
-                  <p className="text-gray-600 text-sm">Following</p>
+                  <p className="text-gray-600 text-xl">Following</p>
                 </div>
               </div>
 
@@ -348,7 +348,7 @@ const Feed = () => {
             </div>
             <div className="m-8">
               <h2 className="text-2xl font-bold text-gray-900">
-                Car Collection
+                Collections
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
                 {userData.carCollection &&
@@ -357,42 +357,18 @@ const Feed = () => {
                       key={index}
                       className="bg-gray-100 p-4 rounded-lg shadow-md"
                     >
-                      <img
+                      {/* <img
                         src={car.imageUrl}
                         alt={car.name}
                         className="w-full h-48 object-cover rounded-md mb-4"
-                      />
+                      /> */}
                       <h3 className="text-xl font-semibold text-gray-900">
-                        {car.name}
+                        {car}
                       </h3>
                       <p className="text-gray-700">{car.description}</p>
                     </div>
                   ))}
               </div>
-            </div>
-            <div className="m-8">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Modifications & Projects
-              </h2>
-              <ul className="list-disc pl-5 mt-4 text-gray-700">
-                {userData.modifications
-                  ? userData.modifications.map((modification, index) => (
-                      <li key={index}>{modification}</li>
-                    ))
-                  : ""}
-              </ul>
-            </div>
-            <div className="m-8">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Favorite Cars
-              </h2>
-              <ul className="list-disc pl-5 mt-4 text-gray-700">
-                {userData.favoriteCars
-                  ? userData.favoriteCars.map((car, index) => (
-                      <li key={index}>{car}</li>
-                    ))
-                  : ""}
-              </ul>
             </div>
             <div className="m-8">
               <h2 className="text-2xl font-bold text-gray-900">

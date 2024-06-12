@@ -185,7 +185,7 @@ const EditForm = () => {
           +
         </label>
       </div>
-      {['firstName', 'lastName', 'bio', 'modifications', 'favoriteCars', 'drivingExperiences', 'carCollection'].map((field) => (
+      {['firstName', 'lastName', 'bio', 'drivingExperiences', 'carCollection'].map((field) => (
         <div className="mb-4" key={field}>
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold">{field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1').trim()}:</h2>
