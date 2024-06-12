@@ -42,8 +42,10 @@ export default function SignupForm() {
         email: email,
         createdAt: new Date(),
         bio:"lorem",
-        followers:0,
-        following:0
+        followers:"",
+        following:"",
+        followingCount:0,
+        followerCount:0
       });
 
       // Clear input fields
