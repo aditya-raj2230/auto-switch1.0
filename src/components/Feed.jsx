@@ -335,7 +335,7 @@ const Feed = () => {
 
           <div className="container flex flex-col items-center mx-auto p-8">
             <h1 className="text-3xl font-bold mb-6">User Vehicles</h1>
-            <VehicleList userId={userId} />
+            <VehicleList userId={selectedUserId} />
           </div>
         </div>
       )}
