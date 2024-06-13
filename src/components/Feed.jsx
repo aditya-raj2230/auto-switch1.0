@@ -266,7 +266,7 @@ const Feed = () => {
                   className="w-full h-72 m-0 mb-44  "
                 />
               ) : (
-                <div className="w-full h-72 bg-gray-200 m-0 mb-10 "></div>
+                <div className="w-full h-72 bg-gray-200 m-0 mb-44 "></div>
               )}
 
               {profileImageUrl ? (
@@ -276,7 +276,7 @@ const Feed = () => {
                   className="w-72 h-72 rounded-full border-4 border-white shadow-lg inline-block mb-4 absolute top-40 right-2/3  "
                 />
               ) : (
-                <div className="w-72 h-72 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 text-3xl border-4 border-white shadow-lg mb-4">
+                <div className="w-72 h-72 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 text-3xl border-4 border-white shadow-lg mb-4 absolute top-40 right-2/3">
                   <span>+</span>
                 </div>
               )}

@@ -1,167 +1,164 @@
 'use client'
+import React, { useState } from 'react';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useRouter } from 'next/navigation';
+import EditForm from './EditForm';
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { auth, db, storage } from "@/app/firebase/config";
-import { onAuthStateChanged } from "firebase/auth";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
-const EditForm2 = () => {
-  const router = useRouter();
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState(null);
-  const [profileImageUrl, setProfileImageUrl] = useState(null);
-
-  const [isEditing, setIsEditing] = useState({
-    name: false,
-    firstName: false,
-    lastName: false,
-    bio: false,
+const EditForm2 = ({ userData,userId }) => {
+  const [formData, setFormData] = useState({
+    type: 'car', // Default value can be 'car' or 'bike'
+    manufacturer: '',
+    model: '',
+    year: '',
+    location: '',
+    image: null,
   });
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserId(user.uid);
-      } else {
-        router.push("/auth/login");
-      }
-    });
-    return () => unsubscribe();
-  }, [router]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const router = useRouter()
+  const [addvehicle,setAddvehicle]=useState(true)
+  
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (userId) {
-        try {
-          const userDoc = doc(db, "users", userId);
-          const userSnapshot = await getDoc(userDoc);
-          if (userSnapshot.exists()) {
-            const data = userSnapshot.data();
-            setUserData(data);
-            setProfileImageUrl(data.profileImageUrl);
-          } else {
-            console.log("No such document!");
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
-        setLoading(false);
-      }
-    };
-    fetchUserData();
-  }, [userId]);
-
-  const handleInputChange = (e, field) => {
-    setUserData((prevData) => ({ ...prevData, [field]: e.target.value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
-  const handleEditToggle = (field) => {
-    setIsEditing((prev) => ({ ...prev, [field]: !prev[field] }));
-  };
-
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const fileRef = ref(storage, `profileImages/${file.name}`);
-    await uploadBytes(fileRef, file);
-    const imageUrl = await getDownloadURL(fileRef);
-
-    setProfileImageUrl(imageUrl);
-
-    if (userId) {
-      const userDoc = doc(db, "users", userId);
-      await updateDoc(userDoc, { profileImageUrl: imageUrl });
-      // Fetch the updated data again
-      const updatedUserSnapshot = await getDoc(userDoc);
-      if (updatedUserSnapshot.exists()) {
-        const updatedData = updatedUserSnapshot.data();
-        setUserData(updatedData);
-        setProfileImageUrl(updatedData.profileImageUrl);
-      }
+  const handleFileChange = (e) => {
+    if (e.target.files[0]) {
+      setFormData((prevData) => ({
+        ...prevData,
+        image: e.target.files[0],
+      }));
     }
   };
 
-  const handleSaveChanges = async () => {
-    if (userId) {
-      const userDoc = doc(db, "users", userId);
-      try {
-        // Update user data
-        await updateDoc(userDoc, userData);
-        alert("Profile updated successfully!");
-        router.push('/');
-      } catch (error) {
-        console.error("Error updating profile:", error);
-        alert("Failed to update profile.");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const db = getFirestore();
+    const storage = getStorage();
+
+    try {
+      let imageUrl = '';
+      if (formData.image) {
+        const storageRef = ref(storage, `vehicles/${formData.image.name}`);
+        await uploadBytes(storageRef, formData.image);
+        imageUrl = await getDownloadURL(storageRef);
       }
+
+      await addDoc(collection(db, 'users', userId, 'vehicles'), {
+        type: formData.type,
+        manufacturer: formData.manufacturer,
+        model: formData.model,
+        year: formData.year,
+        location: formData.location,
+        imageUrl,
+      });
+      setFormData({
+        type: 'car', // Default value can be 'car' or 'bike'
+        manufacturer: '',
+        model: '',
+        year: '',
+        location: '',
+        image: null,
+      })
+      router.push('/edit')
+
+      setLoading(false);
+      setAddvehicle(false)
+      // Redirect or display success message
+    } catch (error) {
+      setError('Error adding document: ', error);
+      setLoading(false);
+      
     }
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!userData) {
-    return <div>No user data found.</div>;
-  }
 
   return (
-    <div className="max-w-md mx-auto bg-white shadow-md rounded-md m-10 p-6">
-      <div className="flex items-center relative mb-4">
-        {profileImageUrl ? (
-          <img src={profileImageUrl} alt="Profile" className="w-96 h-96 rounded-full mr-6" />
-        ) : (
-          <div className="w-96 h-96 rounded-full bg-gray-300 mr-6 flex items-center justify-center text-gray-500 text-xl">
-            <span>+</span>
-          </div>
-        )}
-        <input
-          type="file"
-          onChange={handleImageUpload}
-          className="hidden"
-          id="file-input"
-        />
-        <label
-          htmlFor="file-input"
-          className="bg-gray-200 text-black px-4 py-2 rounded hover:bg-gray-400 cursor-pointer absolute bottom-10 right-10 transform translate-x-1/4 translate-y-1/4"
-        >
-          +
-        </label>
-      </div>
-      {['name', 'firstName', 'lastName', 'bio'].map((field) => (
-        <div className="mb-4" key={field}>
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">{field.charAt(0).toUpperCase() + field.slice(1)}:</h2>
-            <button
-              className="text-sm text-blue-500 focus:outline-none"
-              onClick={() => handleEditToggle(field)}
-            >
-              Edit
-            </button>
-          </div>
-          {!isEditing[field] && <p className="text-gray-600">{userData[field]}</p>}
-          {isEditing[field] && (
-            <input
-              type={field === 'bio' ? 'textarea' : 'text'}
-              value={userData[field] || ''}
-              onChange={(e) => handleInputChange(e, field)}
-              onBlur={() => handleEditToggle(field)}
-              autoFocus
-              className="mt-2 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-            />
-          )}
+    <div>
+    {addvehicle ?
+    <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md space-y-4">
+      <button className='bg-indigo-500 hover:bg-indigo-200 pr-2 pl-2 rounded-2xl 'onClick={()=>{setAddvehicle(false)}}>Back</button>
+      <h2 className="text-2xl font-bold">Add Vehicle</h2>
+      {error && <p className="text-red-500">{error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Type</label>
+          <select
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          >
+            <option value="car">Car</option>
+            <option value="bike">Bike</option>
+          </select>
         </div>
-      ))}
-      <button
-        onClick={handleSaveChanges}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Save Changes
-      </button>
-    </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Manufacturer</label>
+          <input
+            type="text"
+            name="manufacturer"
+            value={formData.manufacturer}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Model</label>
+          <input
+            type="text"
+            name="model"
+            value={formData.model}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Year</label>
+          <input
+            type="text"
+            name="year"
+            value={formData.year}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Location</label>
+          <input
+            type="text"
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Image</label>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+          />
+        </div>
+        <div>
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            {loading ? 'Submitting...' : 'Submit'}
+          </button>
+        </div>
+      </form>
+    </div>:<EditForm/>}</div>
   );
 };
 
