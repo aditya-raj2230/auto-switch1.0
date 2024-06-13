@@ -35,7 +35,7 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="container bg-white-100 shadow-md rounded-lg p-6">
         <Image
-          src="/image.png"
+          src="/newLogo.png"
           alt="logo"
           width={200}
           height={100}
