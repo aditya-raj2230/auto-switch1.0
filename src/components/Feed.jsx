@@ -236,7 +236,7 @@ const Feed = () => {
               <input
                 type="text"
                 id="urlInput"
-                value="localhost:3000"
+                value="https://auto-switch1-0.vercel.app"
                 readOnly
                 className="border p-2 mb-4 w-full"
               />
