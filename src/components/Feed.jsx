@@ -310,8 +310,9 @@ const Feed = () => {
       {userId !== selectedUserId && (
         <div className="flex items-center flex-col">
           <button
-            className={`bg-indigo-600 text-white px-6 m-2 py-2 rounded-lg hover:bg-indigo-800 ${
-              followingList.includes(selectedUserId) ? "bg-gray-600 hover:bg-gray-800" : ""
+          
+            className={`${
+              followingList.includes(selectedUserId) ? "bg-gray-600 text-white px-4 py-2 mt-4 rounded-lg hover:bg-gray-800" : "bg-indigo-600 text-white px-4 py-2 mt-4 rounded-lg hover:bg-indigo-800"
             }`}
             onClick={() => handleFollow(selectedUserId)}
           >
@@ -370,8 +371,8 @@ const Feed = () => {
                     {user.firstName} {user.lastName}
                   </p>
                   <button
-                    className={`bg-indigo-600 text-white px-4 py-2 mt-4 rounded-lg hover:bg-indigo-800 ${
-                      followingList.includes(user.id) ? "bg-gray-600 hover:bg-gray-800" : ""
+                    className={` ${
+                      followingList.includes(user.id) ? "bg-gray-600 text-white px-4 py-2 mt-4 rounded-lg hover:bg-gray-800" : "bg-indigo-600 text-white px-4 py-2 mt-4 rounded-lg hover:bg-indigo-800"
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
