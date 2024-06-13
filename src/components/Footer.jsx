@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="flex-1 mb-4 md:mb-0">
           <h3 className="text-lg md:text-xl font-bold">Auto Switch</h3>
           <p className="mt-2 text-gray-400 text-sm md:text-base">
-            © 2024 Auto Switch. All rights reserved.
+            © 2024 Auto Connect. All rights reserved.
           </p>
         </div>
         <div className="flex flex-row justify-center gap-20">
