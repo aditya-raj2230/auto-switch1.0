@@ -108,7 +108,7 @@ const Navbar2 = () => {
             ) : (
               <>
                 <li>
-                  <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2">
+                  <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2" onClick={()=>{setIsMenuOpen(!isMenuOpen)}}>
                     <Link
                       href="/auth/signup"
                       className="regular-16 text-black group-hover:text-white"
@@ -118,7 +118,7 @@ const Navbar2 = () => {
                   </button>
                 </li>
                 <li>
-                  <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2">
+                  <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2 " onClick={()=>{setIsMenuOpen(!isMenuOpen)}}>
                     <Link
                       href="/auth/login"
                       className="regular-16 text-black group-hover:text-white"

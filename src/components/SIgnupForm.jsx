@@ -18,8 +18,23 @@ export default function SignupForm() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      console.log("Signed in with Google:", user);
-      router.push("/");
+      const userData = {
+      firstName: user.displayName.split(' ')[0], // Assuming display name contains both first and last name
+      lastName: user.displayName.split(' ')[1], // Splitting first and last name
+      email: user.email,
+      createdAt: new Date(),
+      bio: "Lorem ipsum", // Example bio
+      following: [], // Example of empty array for following
+      followers: [], // Example of empty array for followers
+      followingCount: 0,
+      followerCount: 0
+    };
+
+    // Store user data in Firestore
+    await setDoc(doc(db, "users", user.uid), userData);
+
+    console.log("Signed in with Google:", user);
+    router.push("/");
     } catch (error) {
       console.error("Error signing in with Google:", error);
       // toast.error('An error occurred with Google sign-in. Please try again later.');
