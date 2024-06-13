@@ -4,10 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "@/app/firebase/config";
+import { useRouter } from "next/navigation";
 
 const Navbar2 = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const router = useRouter()
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -24,6 +26,7 @@ const Navbar2 = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      router.push('/')
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -33,9 +36,9 @@ const Navbar2 = () => {
     <nav className="flex flex-row top-0 z-30 justify-between px-10 py-2 w-screen sticky bg-white">
       <Link href="/">
         <Image
-          src="/image.png"
+          src="/newLogo.png"
           alt="logo"
-          width={200}
+          width={400}
           height={100}
           className="m-0 p-0"
         />
