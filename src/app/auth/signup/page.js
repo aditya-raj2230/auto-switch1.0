@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation"
 import { auth } from "@/app/firebase/config";  // Adjust the import path according to your project structure
-import SignupForm from "@/components/SignupForm";
+
 import Image from "next/image";
+import SignupForm from "@/components/SignupForm";
 
 export default function SignupPage() {
   const [loading, setLoading] = useState(true);
@@ -31,7 +32,7 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="container bg-white shadow-md rounded-lg p-6">
+      <div className="container bg-white-100 shadow-md rounded-lg p-6">
         <Image
           src="/image.png"
           alt="logo"
