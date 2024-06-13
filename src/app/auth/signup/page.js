@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation"
 import { auth } from "@/app/firebase/config";  // Adjust the import path according to your project structure
 
 import Image from "next/image";
-import SignupForm from "../../../components/SignupForm";
+import SignupForm from "@/components/SignupForm";
+
 
 export default function SignupPage() {
   const [loading, setLoading] = useState(true);
