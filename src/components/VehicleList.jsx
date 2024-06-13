@@ -40,7 +40,7 @@ const VehicleList = ({ userId }) => {
   }
 
   return (
-    <div className="flex flex-wrap justify-around gap-4">
+    <div className="flex flex-row justify-around gap-4">
       {vehicles.map(vehicle => (
         <VehicleCard key={vehicle.id} vehicle={vehicle} />
       ))}

@@ -84,81 +84,86 @@ const EditForm2 = ({ userData,userId }) => {
   return (
     <div>
     {addvehicle ?
-    <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md space-y-4">
-      <button className='bg-indigo-500 hover:bg-indigo-200 pr-2 pl-2 rounded-2xl 'onClick={()=>{setAddvehicle(false)}}>Back</button>
-      <h2 className="text-2xl font-bold">Add Vehicle</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Type</label>
-          <select
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          >
-            <option value="car">Car</option>
-            <option value="bike">Bike</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Manufacturer</label>
-          <input
-            type="text"
-            name="manufacturer"
-            value={formData.manufacturer}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Model</label>
-          <input
-            type="text"
-            name="model"
-            value={formData.model}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Year</label>
-          <input
-            type="text"
-            name="year"
-            value={formData.year}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Location</label>
-          <input
-            type="text"
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Image</label>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-          />
-        </div>
-        <div>
-          <button
-            type="submit"
-            className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          >
-            {loading ? 'Submitting...' : 'Submit'}
-          </button>
-        </div>
-      </form>
-    </div>:<EditForm/>}</div>
+   <div className="p-8 max-w-md mx-auto bg-white rounded-xl shadow-md space-y-6">
+   <button
+     className="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-800"
+     onClick={() => setAddvehicle(false)}
+   >
+     Back
+   </button>
+   <h2 className="text-3xl font-bold text-center text-indigo-600">Add Vehicle</h2>
+   {error && <p className="text-red-500 text-center">{error}</p>}
+   <form onSubmit={handleSubmit} className="space-y-6">
+     <div>
+       <label className="block text-sm font-medium text-gray-700">Type</label>
+       <select
+         name="type"
+         value={formData.type}
+         onChange={handleChange}
+         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+       >
+         <option value="car">Car</option>
+         <option value="bike">Bike</option>
+       </select>
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">Manufacturer</label>
+       <input
+         type="text"
+         name="manufacturer"
+         value={formData.manufacturer}
+         onChange={handleChange}
+         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+       />
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">Model</label>
+       <input
+         type="text"
+         name="model"
+         value={formData.model}
+         onChange={handleChange}
+         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+       />
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">Year</label>
+       <input
+         type="text"
+         name="year"
+         value={formData.year}
+         onChange={handleChange}
+         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+       />
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">Location</label>
+       <input
+         type="text"
+         name="location"
+         value={formData.location}
+         onChange={handleChange}
+         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+       />
+     </div>
+     <div>
+       <label className="block text-sm font-medium text-gray-700">Image</label>
+       <input
+         type="file"
+         onChange={handleFileChange}
+         className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+       />
+     </div>
+     <div>
+       <button
+         type="submit"
+         className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+       >
+         {loading ? 'Submitting...' : 'Submit'}
+       </button>
+     </div>
+   </form>
+ </div>:<EditForm/>}</div>
   );
 };
 
