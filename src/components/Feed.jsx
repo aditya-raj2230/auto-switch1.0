@@ -279,7 +279,7 @@ const Feed = () => {
           className="w-56 h-56  sm:w-72 sm:h-72 lg:absolute lg:ml-32 lg:mr-32 rounded-lg  border-8 md:rounded-full border-white shadow-lg inline-block mb-4 absolute top-28 sm:top-40 right-1/2 sm:right-2/3 transform translate-x-1/2"
         />
       ) : (
-        <div className="w-56 h-56  sm:w-72 sm:h-72 rounded-lg bg-gray-300 flex items-center justify-center text-gray-500 text-3xl md:rounded-full border-8 border-white shadow-lg mb-4 absolute top-28 sm:top-40 right-1/2 sm:right-2/3 transform translate-x-1/2">
+        <div className="w-56 h-56  sm:w-72 sm:h-72 rounded-lg lg:absolute lg:ml-32 lg:mr-32 bg-gray-300 flex items-center justify-center text-gray-500 text-3xl md:rounded-full border-8 border-white shadow-lg mb-4 absolute top-28 sm:top-40 right-1/2 sm:right-2/3 transform translate-x-1/2">
           <span>+</span>
         </div>
       )}
