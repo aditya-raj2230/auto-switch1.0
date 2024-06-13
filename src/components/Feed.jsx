@@ -18,6 +18,7 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "@/app/firebase/config";
 import { FollowProvider, useFollow } from "@/app/context/FollowContext"; // Import the FollowContext
+import VehicleList from "./VehicleList";
 
 const Feed = () => {
   const [users, setUsers] = useState([]);
@@ -30,6 +31,7 @@ const Feed = () => {
   const [selectedUserId, setSelectedUserId] = useState(null); // Updated state to hold the selected user
   const { followingList, setFollowingList } = useFollow(); // Use FollowContext
   const [showModal, setShowModal] = useState(false);
+  const [vehicles, setVehicles] = useState([]);
 
   const [isGray, setIsGray] = useState(false);
   const router = useRouter();
@@ -84,6 +86,7 @@ const Feed = () => {
           const userSnapshot = await getDoc(userDoc);
           if (userSnapshot.exists()) {
             const userData = userSnapshot.data();
+            setVehicles(userData.vehicles || []);
             setUserData(userData);
             setProfileImageUrl(userData.profileImageUrl);
             setBannerImageUrl(userData.bannerImageUrl);
@@ -119,6 +122,7 @@ const Feed = () => {
       // Filter out the logged-in user from the list
       const filteredUsers = userList.filter((user) => user.id !== userId);
       setUsers(filteredUsers);
+      setVehicles(filteredUsers.vehicles || []);
       setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -185,6 +189,7 @@ const Feed = () => {
       if (userSnapshot.exists()) {
         const userData = userSnapshot.data();
         setUserData(userData);
+        setVehicles(userData.vehicles || []);
         setProfileImageUrl(userData.profileImageUrl);
         setBannerImageUrl(userData.bannerImageUrl);
         setSelectedUserId(userId); // Set the selected user to the clicked user
@@ -310,28 +315,25 @@ const Feed = () => {
               </div>
             </div>
             <div className="flex justify-center space-x-4">
-              <div>
-             
-              </div>
+              <div></div>
               {userId !== selectedUserId && (
                 <div className="flex items-center flex-col">
-                
-                <button
-                  className={`bg-blue-500 text-white px-6 m-2 py-2 rounded hover:bg-blue-700 ${
-                    followingList.includes(selectedUserId)
-                      ? "bg-gray-600 hover:bg-gray-700"
-                      : ""
-                  }`}
-                  onClick={() => handleFollow(selectedUserId)}
-                >
-                  {followingList.includes(selectedUserId)
-                    ? "Unfollow"
-                    : "Follow"}
-                </button>
-                <p className="m-2">
-                {
-                    userData.carSwappingInterest?"Interested in Swapping":"not interested in Swapping"
-                  }
+                  <button
+                    className={`bg-blue-500 text-white px-6 m-2 py-2 rounded hover:bg-blue-700 ${
+                      followingList.includes(selectedUserId)
+                        ? "bg-gray-600 hover:bg-gray-700"
+                        : ""
+                    }`}
+                    onClick={() => handleFollow(selectedUserId)}
+                  >
+                    {followingList.includes(selectedUserId)
+                      ? "Unfollow"
+                      : "Follow"}
+                  </button>
+                  <p className="m-2">
+                    {userData.carSwappingInterest
+                      ? "Interested in Swapping"
+                      : "not interested in Swapping"}
                   </p>
                 </div>
               )}
@@ -344,44 +346,24 @@ const Feed = () => {
                   Finish Profile
                 </button>
               )}
-              
             </div>
-            <div className="m-8">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Collections
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                {userData.carCollection &&
-                  userData.carCollection.map((car, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-100 p-4 rounded-lg shadow-md"
-                    >
-                      {/* <img
-                        src={car.imageUrl}
-                        alt={car.name}
-                        className="w-full h-48 object-cover rounded-md mb-4"
-                      /> */}
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        {car}
-                      </h3>
-                      <p className="text-gray-700">{car.description}</p>
-                    </div>
-                  ))}
-              </div>
+
+            <div className="container flex flex-col items-center mx-auto p-8">
+              <h1 className="text-3xl font-bold mb-6">User Vehicles</h1>
+              <VehicleList userId={userId} />
             </div>
-            <div className="m-8">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Driving Experiences
-              </h2>
-              <ul className="list-disc pl-5 mt-4 text-gray-700">
-                {userData.drivingExperiences
-                  ? userData.drivingExperiences.map((experience, index) => (
-                      <li key={index}>{experience}</li>
-                    ))
-                  : ""}
-              </ul>
-            </div>
+          </div>
+          <div className="m-8">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Driving Experiences
+            </h2>
+            <ul className="list-disc pl-5 mt-4 text-gray-700">
+              {userData.drivingExperiences
+                ? userData.drivingExperiences.map((experience, index) => (
+                    <li key={index}>{experience}</li>
+                  ))
+                : ""}
+            </ul>
           </div>
         </div>
       )}
