@@ -34,7 +34,7 @@ export default function SignupForm() {
     await setDoc(doc(db, "users", user.uid), userData);
 
     console.log("Signed in with Google:", user);
-    router.push("/");
+    router.push("/feed");
     } catch (error) {
       console.error("Error signing in with Google:", error);
       // toast.error('An error occurred with Google sign-in. Please try again later.');
@@ -70,7 +70,7 @@ export default function SignupForm() {
       setPassword("");
       
       // Redirect to home page
-      router.push('/');
+      router.push('/feed');
     } catch (error) {
       console.error(error);
     }

@@ -18,7 +18,7 @@ export default function LoginForm() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log("Signed in with Google:", user);
-      router.push('/')
+      router.push('/feed')
     } catch (error) {
       console.error("Error signing in with Google:", error);
       
@@ -35,7 +35,7 @@ export default function LoginForm() {
     try {
       const userCredential = await loginUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
-      router.push('/')
+      router.push('/feed')
       setEmail('');
       setPassword('');
       
