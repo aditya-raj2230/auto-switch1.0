@@ -29,27 +29,54 @@ const UserList = () => {
     setLoading(true);
     try {
       const usersRef = collection(db, "users");
-      let q;
+      let firstNameQuery;
+      let displayNameQuery;
+
       if (searchTerm) {
-        q = query(
+        firstNameQuery = query(
           usersRef,
           orderBy("firstName"),
           where("firstName", ">=", searchTerm),
           where("firstName", "<=", searchTerm + "\uf8ff"),
           limit(10)
         );
+
+        displayNameQuery = query(
+          usersRef,
+          orderBy("displayName_upperCase"),
+          where("displayName_upperCase", ">=", searchTerm.toUpperCase()),
+          where("displayName_upperCase", "<=", searchTerm.toUpperCase() + "\uf8ff"),
+          limit(10)
+        );
       } else {
-        q = query(usersRef, orderBy("firstName"), limit(10));
+        firstNameQuery = query(usersRef, orderBy("firstName"), limit(10));
+        displayNameQuery = query(usersRef, orderBy("displayName_upperCase"), limit(10));
       }
-      const querySnapshot = await getDocs(q);
-      const userList = [];
-      querySnapshot.forEach((doc) => {
-        userList.push({ id: doc.id, ...doc.data() });
+
+      const [firstNameSnapshot, displayNameSnapshot] = await Promise.all([
+        getDocs(firstNameQuery),
+        getDocs(displayNameQuery),
+      ]);
+
+      const firstNameUserList = [];
+      firstNameSnapshot.forEach((doc) => {
+        firstNameUserList.push({ id: doc.id, ...doc.data() });
       });
+
+      const displayNameUserList = [];
+      displayNameSnapshot.forEach((doc) => {
+        displayNameUserList.push({ id: doc.id, ...doc.data() });
+      });
+
+      // Combine the lists and remove duplicates
+      const combinedUserList = [...firstNameUserList, ...displayNameUserList];
+      const uniqueUserList = Array.from(new Set(combinedUserList.map(user => user.id)))
+        .map(id => combinedUserList.find(user => user.id === id));
+
       // Filter out the logged-in user from the list
-      const filteredUsers = userList.filter((user) => user.id !== userId);
+      const filteredUsers = uniqueUserList.filter((user) => user.id !== userId);
       setUsers(filteredUsers);
-      setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setLastVisible(firstNameSnapshot.docs[firstNameSnapshot.docs.length - 1]);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -61,9 +88,11 @@ const UserList = () => {
     setLoading(true);
     try {
       const usersRef = collection(db, "users");
-      let q;
+      let firstNameQuery;
+      let displayNameQuery;
+
       if (searchTerm) {
-        q = query(
+        firstNameQuery = query(
           usersRef,
           orderBy("firstName"),
           where("firstName", ">=", searchTerm),
@@ -71,17 +100,43 @@ const UserList = () => {
           startAfter(lastVisible),
           limit(10)
         );
+
+        displayNameQuery = query(
+          usersRef,
+          orderBy("displayName_upperCase"),
+          where("displayName_upperCase", ">=", searchTerm.toUpperCase()),
+          where("displayName_upperCase", "<=", searchTerm.toUpperCase() + "\uf8ff"),
+          startAfter(lastVisible),
+          limit(10)
+        );
       } else {
-        q = query(usersRef, orderBy("firstName"), startAfter(lastVisible), limit(10));
+        firstNameQuery = query(usersRef, orderBy("firstName"), startAfter(lastVisible), limit(10));
+        displayNameQuery = query(usersRef, orderBy("displayName_upperCase"), startAfter(lastVisible), limit(10));
       }
-      const querySnapshot = await getDocs(q);
-      const userList = [];
-      querySnapshot.forEach((doc) => {
-        userList.push({ id: doc.id, ...doc.data() });
+
+      const [firstNameSnapshot, displayNameSnapshot] = await Promise.all([
+        getDocs(firstNameQuery),
+        getDocs(displayNameQuery),
+      ]);
+
+      const firstNameUserList = [];
+      firstNameSnapshot.forEach((doc) => {
+        firstNameUserList.push({ id: doc.id, ...doc.data() });
       });
-      const filteredUsers = userList.filter((user) => user.id !== userId);
+
+      const displayNameUserList = [];
+      displayNameSnapshot.forEach((doc) => {
+        displayNameUserList.push({ id: doc.id, ...doc.data() });
+      });
+
+      // Combine the lists and remove duplicates
+      const combinedUserList = [...firstNameUserList, ...displayNameUserList];
+      const uniqueUserList = Array.from(new Set(combinedUserList.map(user => user.id)))
+        .map(id => combinedUserList.find(user => user.id === id));
+
+      const filteredUsers = uniqueUserList.filter((user) => user.id !== userId);
       setUsers((prevUsers) => [...prevUsers, ...filteredUsers]);
-      setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setLastVisible(firstNameSnapshot.docs[firstNameSnapshot.docs.length - 1]);
     } catch (error) {
       console.error("Error fetching more users:", error);
     }
@@ -93,7 +148,7 @@ const UserList = () => {
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search by first name..."
+          placeholder="Search by first name or display name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded-lg"

@@ -22,6 +22,7 @@ export default function SignupForm() {
       firstName: user.displayName.split(' ')[0], // Assuming display name contains both first and last name
       lastName: user.displayName.split(' ')[1], // Splitting first and last name
       displayName:user.displayName.toLowerCase(),
+      displayName_upperCase: user.displayName.toUpperCase(),
       email: user.email,
       createdAt: new Date(),
       bio: "Lorem ipsum", // Example bio
@@ -50,12 +51,14 @@ export default function SignupForm() {
       // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
+      
 
       // Add user info to Firestore
       await setDoc(doc(db, "users", user.uid), {
         firstName: firstName,
         lastName: lastName,
         displayName: firstName.toLowerCase()+lastName.toLowerCase(),
+        displayName_upperCase:firstName.toUpperCase()+lastName.toUpperCase(),
         email: email,
         createdAt: new Date(),
         bio:"lorem",
