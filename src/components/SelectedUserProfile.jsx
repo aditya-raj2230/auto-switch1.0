@@ -1,5 +1,5 @@
-// components/UserProfile.js
 'use client'
+
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, increment } from "firebase/firestore";
@@ -8,16 +8,16 @@ import { useFollow } from "../app/context/FollowContext"; // Import the FollowCo
 import { useAuth } from "../app/context/AuthContext"; // Import the AuthContext
 import VehicleList from "./VehicleList";
 
-const UserProfile = ({ selectedUserId }) => {
+const SelectedUserProfile = ({ selectedUserId }) => {
   const [userData, setUserData] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [bannerImageUrl, setBannerImageUrl] = useState(null);
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [followLoading, setFollowLoading] = useState(false);
   const { followingList, setFollowingList } = useFollow(); // Use FollowContext
   const { user } = useAuth();
   const userId = user?.uid;
-  const router = useRouter();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -26,12 +26,11 @@ const UserProfile = ({ selectedUserId }) => {
           const userDoc = doc(db, "users", selectedUserId);
           const userSnapshot = await getDoc(userDoc);
           if (userSnapshot.exists()) {
-            const userData = userSnapshot.data();
-            setUserData(userData);
-            setVehicles(userData.vehicles || []);
-            setProfileImageUrl(userData.profileImageUrl);
-            setBannerImageUrl(userData.bannerImageUrl);
-            setFollowingList(userData.following || []);
+            const data = userSnapshot.data();
+            setUserData(data);
+            setVehicles(data.vehicles || []);
+            setProfileImageUrl(data.profileImageUrl);
+            setBannerImageUrl(data.bannerImageUrl);
           } else {
             console.log("No such document!");
           }
@@ -45,13 +44,52 @@ const UserProfile = ({ selectedUserId }) => {
     fetchUserData();
   }, [selectedUserId]);
 
-  
-  const handleEdit = () => {
-    router.push("/edit");
+  const handleFollow = async (targetUserId) => {
+    if (followLoading) return; // Prevent multiple requests
+    setFollowLoading(true);
+
+    const isFollowing = followingList.includes(targetUserId);
+    const userDocRef = doc(db, "users", userId);
+    const targetUserDocRef = doc(db, "users", targetUserId);
+
+    // Optimistic UI update
+    setFollowingList((prevList) =>
+      isFollowing
+        ? prevList.filter((id) => id !== targetUserId)
+        : [...prevList, targetUserId]
+    );
+
+    try {
+      await updateDoc(userDocRef, {
+        following: isFollowing
+          ? arrayRemove(targetUserId)
+          : arrayUnion(targetUserId),
+        followingCount: increment(isFollowing ? -1 : 1),
+      });
+
+      await updateDoc(targetUserDocRef, {
+        followers: isFollowing ? arrayRemove(userId) : arrayUnion(userId),
+        followerCount: increment(isFollowing ? -1 : 1),
+      });
+    } catch (error) {
+      console.error("Error updating follow status:", error);
+      // Revert the optimistic update if the request fails
+      setFollowingList((prevList) =>
+        isFollowing
+          ? [...prevList, targetUserId]
+          : prevList.filter((id) => id !== targetUserId)
+      );
+    } finally {
+      setFollowLoading(false);
+    }
   };
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (!userData) {
+    return <div>No user data found.</div>;
   }
 
   return (
@@ -71,10 +109,10 @@ const UserProfile = ({ selectedUserId }) => {
           <img
             src={profileImageUrl}
             alt="Profile"
-            className="w-56 h-56  sm:w-72 sm:h-72 lg:absolute lg:ml-32 lg:mr-32 rounded-lg  border-8 md:rounded-full border-white shadow-lg inline-block mb-4 absolute top-28 sm:top-40 right-1/2 sm:right-2/3 transform translate-x-1/2"
+            className="w-56 h-56 sm:w-72 sm:h-72 lg:absolute lg:ml-32 lg:mr-32 rounded-lg border-8 md:rounded-full border-white shadow-lg inline-block mb-4 absolute top-28 sm:top-40 right-1/2 sm:right-2/3 transform translate-x-1/2"
           />
         ) : (
-          <div className="w-56 h-56  sm:w-72 sm:h-72 rounded-lg lg:absolute lg:ml-32 lg:mr-32 bg-gray-300 flex items-center justify-center text-gray-500 text-3xl md:rounded-full border-8 border-white shadow-lg mb-4 absolute top-28 sm:top-40 right-1/2 sm:right-2/3 transform translate-x-1/2">
+          <div className="w-56 h-56 sm:w-72 sm:h-72 rounded-lg lg:absolute lg:ml-32 lg:mr-32 bg-gray-300 flex items-center justify-center text-gray-500 text-3xl md:rounded-full border-8 border-white shadow-lg mb-4 absolute top-28 sm:top-40 right-1/2 sm:right-2/3 transform translate-x-1/2">
             <span>+</span>
           </div>
         )}
@@ -101,15 +139,23 @@ const UserProfile = ({ selectedUserId }) => {
       </div>
 
       <div className="flex justify-center space-x-4">
-      
-
-        {userId === selectedUserId && (
-          <button
-            className="bg-indigo-600 text-white px-6 py-2 m-2 rounded-lg hover:bg-indigo-800"
-            onClick={handleEdit}
-          >
-            Finish Profile
-          </button>
+        {userId !== selectedUserId && (
+          <div className="flex items-center flex-col">
+            <button
+              className={`${
+                followingList.includes(selectedUserId)
+                  ? "bg-gray-600 text-white px-4 py-2 mt-4 rounded-lg hover:bg-gray-800"
+                  : "bg-indigo-600 text-white px-4 py-2 mt-4 rounded-lg hover:bg-indigo-800"
+              } ${followLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              onClick={() => handleFollow(selectedUserId)}
+              disabled={followLoading}
+            >
+              {followLoading ? "Processing..." : followingList.includes(selectedUserId) ? "Unfollow" : "Follow"}
+            </button>
+            <p className="m-2">
+              {userData.carSwappingInterest ? "Interested in Swapping" : "Not interested in Swapping"}
+            </p>
+          </div>
         )}
       </div>
 
@@ -121,4 +167,4 @@ const UserProfile = ({ selectedUserId }) => {
   );
 };
 
-export default UserProfile;
+export default SelectedUserProfile;

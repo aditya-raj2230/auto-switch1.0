@@ -47,7 +47,7 @@ const Navbar2 = () => {
         {user ? (
           <>
             <li>
-              <Link href={`/profile/${user.uid}`}>
+              <Link href={`/`}>
                 Profile
               </Link>
             </li>
@@ -103,7 +103,7 @@ const Navbar2 = () => {
             {user ? (
               <>
                 <li>
-                  <Link href={`/profile/${user.uid}`}>
+                  <Link href={`/`}>
                     Profile
                   </Link>
                 </li>
