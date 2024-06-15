@@ -1,23 +1,23 @@
+// src/components/Navbar2.jsx
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from "@/app/firebase/config";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/context/AuthContext"; // Import the AuthContext
 
 const Navbar2 = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const router = useRouter()
+  const router = useRouter();
+  const { user } = useAuth();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-
-    return () => unsubscribe();
-  }, []);
+    if (user) {
+      console.log(user.uid, "User ID");
+    }
+  }, [user]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -26,7 +26,7 @@ const Navbar2 = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      router.push('/')
+      router.push('/');
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -45,35 +45,36 @@ const Navbar2 = () => {
       </Link>
       <ul className="hidden h-full gap-12 lg:flex m-4">
         {user ? (
-          <li>
-            <button
-              onClick={handleLogout}
-              className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2"
-            >
-              Logout 
-            </button>
-          </li>
+          <>
+            <li>
+              <Link href={`/profile/${user.uid}`}>
+                Profile
+              </Link>
+            </li>
+            <li>
+              <button
+                onClick={handleLogout}
+                className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2"
+              >
+                Logout
+              </button>
+            </li>
+          </>
         ) : (
           <>
             <li>
-              <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2">
-                <Link
-                  href="/auth/signup"
-                  className="regular-16 text-black group-hover:text-white"
-                >
+              <Link href="/auth/signup">
+                <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2">
                   Sign Up
-                </Link>
-              </button>
+                </button>
+              </Link>
             </li>
             <li>
-              <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2">
-                <Link
-                  href="/auth/login"
-                  className="regular-16 text-black group-hover:text-white"
-                >
+              <Link href="/auth/login">
+                <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2">
                   Login
-                </Link>
-              </button>
+                </button>
+              </Link>
             </li>
           </>
         )}
@@ -100,35 +101,42 @@ const Navbar2 = () => {
           </button>
           <ul className="flex flex-col items-center gap-4 mt-8">
             {user ? (
-              <li>
-                <button
-                  onClick={handleLogout}
-                  className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2"
-                >
-                  Logout 
-                </button>
-              </li>
+              <>
+                <li>
+                  <Link href={`/profile/${user.uid}`}>
+                    Profile
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
             ) : (
               <>
                 <li>
-                  <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2" onClick={()=>{setIsMenuOpen(!isMenuOpen)}}>
-                    <Link
-                      href="/auth/signup"
-                      className="regular-16 text-black group-hover:text-white"
+                  <Link href="/auth/signup">
+                    <button
+                      className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2"
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       Sign Up
-                    </Link>
-                  </button>
+                    </button>
+                  </Link>
                 </li>
                 <li>
-                  <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2 " onClick={()=>{setIsMenuOpen(!isMenuOpen)}}>
-                    <Link
-                      href="/auth/login"
-                      className="regular-16 text-black group-hover:text-white"
+                  <Link href="/auth/login">
+                    <button
+                      className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2"
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       Login
-                    </Link>
-                  </button>
+                    </button>
+                  </Link>
                 </li>
               </>
             )}

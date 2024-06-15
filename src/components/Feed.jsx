@@ -15,9 +15,9 @@ import {
   arrayRemove,
   increment,
 } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
-import { db, auth } from "@/app/firebase/config";
-import { FollowProvider, useFollow } from "@/app/context/FollowContext"; // Import the FollowContext
+import { db } from "@/app/firebase/config";
+import { FollowProvider, useFollow } from "../app/context/FollowContext"; // Import the FollowContext
+import { AuthProvider, useAuth } from "../app/context/AuthContext"; // Import the AuthContext
 import VehicleList from "./VehicleList";
 
 const Feed = () => {
@@ -27,14 +27,15 @@ const Feed = () => {
   const [userData, setUserData] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState(null);
   const [bannerImageUrl, setBannerImageUrl] = useState(null);
-  const [userId, setUserId] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null); // Updated state to hold the selected user
   const { followingList, setFollowingList } = useFollow(); // Use FollowContext
   const [showModal, setShowModal] = useState(false);
   const [vehicles, setVehicles] = useState([]);
-
   const [isGray, setIsGray] = useState(false);
   const router = useRouter();
+
+  const { user } = useAuth();
+  const userId = user?.uid;
 
   const handleFollow = async (targetUserId) => {
     const isFollowing = followingList.includes(targetUserId);
@@ -66,17 +67,12 @@ const Feed = () => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserId(user.uid);
-        setSelectedUserId(user.uid); // Set the selected user to the logged-in user
-      } else {
-        router.push("/auth/login");
-      }
-    });
-
-    return () => unsubscribe();
-  }, [router]);
+    if (!userId) {
+      router.push("/auth/login");
+    } else {
+      setSelectedUserId(userId); // Set the selected user to the logged-in user
+    }
+  }, [userId, router]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -401,10 +397,6 @@ const Feed = () => {
   );
 };
 
-const FeedWithProvider = () => (
-  <FollowProvider>
-    <Feed />
-  </FollowProvider>
-);
 
-export default FeedWithProvider;
+
+export default Feed;
