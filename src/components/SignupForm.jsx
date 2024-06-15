@@ -21,6 +21,7 @@ export default function SignupForm() {
       const userData = {
       firstName: user.displayName.split(' ')[0], // Assuming display name contains both first and last name
       lastName: user.displayName.split(' ')[1], // Splitting first and last name
+      displayName:user.displayName.toLowerCase(),
       email: user.email,
       createdAt: new Date(),
       bio: "Lorem ipsum", // Example bio
@@ -54,6 +55,7 @@ export default function SignupForm() {
       await setDoc(doc(db, "users", user.uid), {
         firstName: firstName,
         lastName: lastName,
+        displayName: firstName.toLowerCase()+lastName.toLowerCase(),
         email: email,
         createdAt: new Date(),
         bio:"lorem",
