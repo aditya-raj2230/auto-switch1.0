@@ -1,6 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { db } from "@/app/firebase/config";
-import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, limit, startAfter } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
+  serverTimestamp,
+  limit,
+  startAfter,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import ReplySection from "./ReplySection";
 
 const CommentSection = ({ userId, postId, currentUser }) => {
@@ -13,14 +24,65 @@ const CommentSection = ({ userId, postId, currentUser }) => {
   const [hasMoreComments, setHasMoreComments] = useState(true);
   const COMMENTS_LIMIT = 5;
 
+  // Function to format relative time
+  const formatRelativeTime = (timestampInSeconds) => {
+    const currentTimestamp = Date.now() / 1000;
+    const seconds = Math.floor(currentTimestamp - timestampInSeconds);
+
+    let interval = Math.floor(seconds / 31536000);
+    if (interval >= 1) {
+      return `${interval} year${interval === 1 ? "" : "s"} ago`;
+    }
+
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) {
+      return `${interval} month${interval === 1 ? "" : "s"} ago`;
+    }
+
+    interval = Math.floor(seconds / 86400);
+    if (interval >= 1) {
+      return `${interval} day${interval === 1 ? "" : "s"} ago`;
+    }
+
+    interval = Math.floor(seconds / 3600);
+    if (interval >= 1) {
+      return `${interval} hour${interval === 1 ? "" : "s"} ago`;
+    }
+
+    interval = Math.floor(seconds / 60);
+    if (interval >= 1) {
+      return `${interval} minute${interval === 1 ? "" : "s"} ago`;
+    }
+
+    return `${Math.floor(seconds)} second${
+      Math.floor(seconds) === 1 ? "" : "s"
+    } ago`;
+  };
+
   const fetchComments = async (loadMore = false) => {
     try {
       setLoading(true);
-      const commentsRef = collection(db, "users", userId, "posts", postId, "comments");
-      let q = query(commentsRef, orderBy("createdAt", "desc"), limit(COMMENTS_LIMIT));
-      
+      const commentsRef = collection(
+        db,
+        "users",
+        userId,
+        "posts",
+        postId,
+        "comments"
+      );
+      let q = query(
+        commentsRef,
+        orderBy("createdAt", "desc"),
+        limit(COMMENTS_LIMIT)
+      );
+
       if (loadMore && lastVisible) {
-        q = query(commentsRef, orderBy("createdAt", "desc"), startAfter(lastVisible), limit(COMMENTS_LIMIT));
+        q = query(
+          commentsRef,
+          orderBy("createdAt", "desc"),
+          startAfter(lastVisible),
+          limit(COMMENTS_LIMIT)
+        );
       }
 
       const querySnapshot = await getDocs(q);
@@ -47,16 +109,33 @@ const CommentSection = ({ userId, postId, currentUser }) => {
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
     try {
-      const commentsRef = collection(db, "users", userId, "posts", postId, "comments");
-      await addDoc(commentsRef, {
-        content: newComment,
-        userId: currentUser.uid,
-        username: currentUser.firstName,
-        profilePic: currentUser.profileImageUrl,
-        createdAt: serverTimestamp(),
-      });
-      setNewComment("");
-      fetchComments();
+      // Fetch user details
+      const userRef = doc(db, "users", currentUser.uid);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+
+        // Add comment with user details
+        const commentsRef = collection(
+          db,
+          "users",
+          userId,
+          "posts",
+          postId,
+          "comments"
+        );
+        await addDoc(commentsRef, {
+          content: newComment,
+          userId: currentUser.uid,
+          username: userData.firstName,
+          profilePic: userData.profileImageUrl,
+          createdAt: serverTimestamp(),
+        });
+        setNewComment("");
+        fetchComments();
+      } else {
+        console.error("User data not found");
+      }
     } catch (error) {
       console.error("Error adding comment:", error);
     }
@@ -70,9 +149,43 @@ const CommentSection = ({ userId, postId, currentUser }) => {
     setIsReplyOpen(isOpen);
   };
 
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    // Adjust the height of the textarea based on the content
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+    }
+  }, [newComment]);
+
   return (
     <div className="w-full mt-6">
       <h3 className="text-xl font-bold mb-4">Comments</h3>
+      {!isReplyOpen && (
+        <div className="mt-4 flex items-start">
+        <textarea
+          ref={textareaRef}
+          className="w-full p-2 border border-gray-300 rounded-lg"
+          style={{
+            minHeight: "3rem", // Minimum height to start with
+            lineHeight: "1.5", // Line height for consistent spacing
+            resize: "none", // Disable manual resizing
+            overflowY: "hidden", // Hide overflow to prevent scrollbar
+          }}
+          placeholder="Add a comment..."
+          rows={1} // Initial rows, will dynamically adjust
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+        />
+        <button
+          className="ml-2 px-4 py-2 mt-1 bg-blue-500 text-white rounded-lg"
+          onClick={handleAddComment}
+        >
+         {">"}
+        </button>
+      </div>
+      )}
       {loading ? (
         <p>Loading comments...</p>
       ) : (
@@ -80,24 +193,28 @@ const CommentSection = ({ userId, postId, currentUser }) => {
           {comments.map((comment) => (
             <div key={comment.id} className="p-4 bg-gray-100 rounded-lg">
               <div className="flex items-center mb-2">
-                <img src={comment.profilePic} alt={comment.username} className="w-8 h-8 rounded-full mr-2" />
+                <img
+                  src={comment.profilePic}
+                  alt={comment.username}
+                  className="w-8 h-8 rounded-full mr-2"
+                />
                 <p className="text-gray-700">{comment.username}</p>
               </div>
               <p className="text-gray-700">{comment.content}</p>
               <p className="text-gray-500 text-sm">
-                {comment.createdAt?.seconds
-                  ? new Date(comment.createdAt.seconds * 1000).toLocaleString()
-                  : "Just now"}
+                {formatRelativeTime(comment.createdAt.seconds)}
               </p>
               <ReplySection
-                userId={userId}
-                postId={postId}
-                commentId={comment.id}
-                currentUser={currentUser}
-                onReplyOpen={handleReplyOpen}
-                activeReply={activeReply}
-                setActiveReply={setActiveReply}
-              />
+            userId={userId}
+            postId={postId}
+            commentId={comment.id}
+            currentUser={currentUser}
+            activeReply={activeReply}
+            setActiveReply={setActiveReply}
+            newComment={newComment}
+            setNewComment={setNewComment}
+            handleAddComment={handleAddComment}
+          />
             </div>
           ))}
           {hasMoreComments && (
@@ -108,23 +225,6 @@ const CommentSection = ({ userId, postId, currentUser }) => {
               Load More Comments
             </button>
           )}
-        </div>
-      )}
-      {!isReplyOpen && (
-        <div className="mt-4">
-          <textarea
-            className="w-full p-2 border border-gray-300 rounded-lg"
-            rows="3"
-            placeholder="Add a comment..."
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-          ></textarea>
-          <button
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
-            onClick={handleAddComment}
-          >
-            Add Comment
-          </button>
         </div>
       )}
     </div>

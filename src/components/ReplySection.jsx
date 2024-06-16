@@ -1,22 +1,64 @@
 import React, { useState, useEffect } from "react";
 import { db } from "@/app/firebase/config";
-import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, limit, startAfter } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, limit, startAfter, doc, getDoc } from "firebase/firestore";
 
-const ReplySection = ({ userId, postId, commentId, currentUser, onReplyOpen, activeReply, setActiveReply }) => {
+const ReplySection = ({
+  userId,
+  postId,
+  commentId,
+  currentUser,
+  activeReply,
+  setActiveReply,
+  newComment,
+  setNewComment,
+  handleAddComment,
+}) => {
   const [replies, setReplies] = useState([]);
-  const [newReply, setNewReply] = useState("");
   const [loading, setLoading] = useState(true);
   const [showReplies, setShowReplies] = useState(false);
   const [lastVisible, setLastVisible] = useState(null);
   const [hasMoreReplies, setHasMoreReplies] = useState(true);
   const REPLIES_LIMIT = 5;
 
+  // Function to format relative time
+  const formatRelativeTime = (timestampInSeconds) => {
+    const currentTimestamp = Date.now() / 1000;
+    const seconds = Math.floor(currentTimestamp - timestampInSeconds);
+
+    let interval = Math.floor(seconds / 31536000);
+    if (interval >= 1) {
+      return `${interval} year${interval === 1 ? "" : "s"} ago`;
+    }
+
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) {
+      return `${interval} month${interval === 1 ? "" : "s"} ago`;
+    }
+
+    interval = Math.floor(seconds / 86400);
+    if (interval >= 1) {
+      return `${interval} day${interval === 1 ? "" : "s"} ago`;
+    }
+
+    interval = Math.floor(seconds / 3600);
+    if (interval >= 1) {
+      return `${interval} hour${interval === 1 ? "" : "s"} ago`;
+    }
+
+    interval = Math.floor(seconds / 60);
+    if (interval >= 1) {
+      return `${interval} minute${interval === 1 ? "" : "s"} ago`;
+    }
+
+    return `${Math.floor(seconds)} second${Math.floor(seconds) === 1 ? "" : "s"} ago`;
+  };
+
   const fetchReplies = async (loadMore = false) => {
     try {
       setLoading(true);
       const repliesRef = collection(db, "users", userId, "posts", postId, "comments", commentId, "replies");
       let q = query(repliesRef, orderBy("createdAt", "desc"), limit(REPLIES_LIMIT));
-      
+
       if (loadMore && lastVisible) {
         q = query(repliesRef, orderBy("createdAt", "desc"), startAfter(lastVisible), limit(REPLIES_LIMIT));
       }
@@ -43,18 +85,29 @@ const ReplySection = ({ userId, postId, commentId, currentUser, onReplyOpen, act
   };
 
   const handleAddReply = async () => {
-    if (!newReply.trim()) return;
+    if (!newComment.trim()) return;
+
     try {
-      const repliesRef = collection(db, "users", userId, "posts", postId, "comments", commentId, "replies");
-      await addDoc(repliesRef, {
-        content: newReply,
-        userId: currentUser.uid,
-        username: currentUser.displayName,
-        profilePic: currentUser.photoURL,
-        createdAt: serverTimestamp(),
-      });
-      setNewReply("");
-      fetchReplies();
+      // Fetch user details
+      const userRef = doc(db, "users", currentUser.uid);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+
+        // Add reply with user details
+        const repliesRef = collection(db, "users", userId, "posts", postId, "comments", commentId, "replies");
+        await addDoc(repliesRef, {
+          content: newComment,
+          userId: currentUser.uid,
+          username: userData.firstName,
+          profilePic: userData.profileImageUrl,
+          createdAt: serverTimestamp(),
+        });
+        setNewComment("");
+        fetchReplies();
+      } else {
+        console.error("User data not found");
+      }
     } catch (error) {
       console.error("Error adding reply:", error);
     }
@@ -72,7 +125,6 @@ const ReplySection = ({ userId, postId, commentId, currentUser, onReplyOpen, act
         className="text-blue-500"
         onClick={() => {
           setShowReplies(!showReplies);
-          onReplyOpen(!showReplies);
           setActiveReply(commentId);
         }}
       >
@@ -92,9 +144,7 @@ const ReplySection = ({ userId, postId, commentId, currentUser, onReplyOpen, act
                   </div>
                   <p className="text-gray-700">{reply.content}</p>
                   <p className="text-gray-500 text-sm">
-                    {reply.createdAt?.seconds
-                      ? new Date(reply.createdAt.seconds * 1000).toLocaleString()
-                      : "Just now"}
+                    {formatRelativeTime(reply.createdAt.seconds)}
                   </p>
                 </div>
               ))}
@@ -109,19 +159,24 @@ const ReplySection = ({ userId, postId, commentId, currentUser, onReplyOpen, act
             </div>
           )}
           {activeReply === commentId && (
-            <div className="mt-4">
+            <div className="mt-4 flex items-start">
               <textarea
                 className="w-full p-2 border border-gray-300 rounded-lg"
-                rows="2"
+                style={{
+                  minHeight: "3rem",
+                  lineHeight: "1.5",
+                  resize: "none",
+                  overflowY: "hidden",
+                }}
                 placeholder="Add a reply..."
-                value={newReply}
-                onChange={(e) => setNewReply(e.target.value)}
-              ></textarea>
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+              />
               <button
-                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
+                className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
                 onClick={handleAddReply}
               >
-                Add Reply
+                {">"}
               </button>
             </div>
           )}
