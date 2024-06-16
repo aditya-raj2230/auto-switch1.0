@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { db } from "@/app/firebase/config"; // Update with your Firebase configuration
 import { collection, getDocs, doc, updateDoc, arrayUnion, arrayRemove, onSnapshot, getDoc } from "firebase/firestore";
 import { useAuth } from '../app/context/AuthContext'; // Assuming you have an Auth context to get the current user
+import Link from "next/link";
 
 const PublicPosts = () => {
   const { user } = useAuth();
@@ -151,8 +152,10 @@ const PublicPosts = () => {
                 <span className="ml-2">{post.likeCount || 0}</span>
               </button>
 
-              <button className="flex items-center text-gray-500 hover:text-blue-500">
+              <button className="flex items-center text-gray-500 hover:text-blue-500" >
+                <Link href={`/post/${post.userId}-${post.id}`} passHref>
                 <img src="/icons8-comment-50.png" alt="Comment" className="h-8 w-8" />
+                </Link>
               </button>
               <button className="flex items-center text-gray-500 hover:text-blue-500">
                 <img src="/icons8-share-50.png" alt="Share" className="h-8 w-8" />
