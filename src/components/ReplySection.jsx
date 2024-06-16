@@ -1,6 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { db } from "@/app/firebase/config";
-import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, limit, startAfter, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
+  serverTimestamp,
+  limit,
+  startAfter,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 
 const ReplySection = ({
   userId,
@@ -19,8 +30,21 @@ const ReplySection = ({
   const [lastVisible, setLastVisible] = useState(null);
   const [hasMoreReplies, setHasMoreReplies] = useState(true);
   const REPLIES_LIMIT = 5;
+  const textareaRef = useRef(null);
 
-  // Function to format relative time
+  useEffect(() => {
+    if (showReplies) {
+      fetchReplies();
+    }
+  }, [showReplies]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+    }
+  }, [newComment]);
+
   const formatRelativeTime = (timestampInSeconds) => {
     const currentTimestamp = Date.now() / 1000;
     const seconds = Math.floor(currentTimestamp - timestampInSeconds);
@@ -56,11 +80,29 @@ const ReplySection = ({
   const fetchReplies = async (loadMore = false) => {
     try {
       setLoading(true);
-      const repliesRef = collection(db, "users", userId, "posts", postId, "comments", commentId, "replies");
-      let q = query(repliesRef, orderBy("createdAt", "desc"), limit(REPLIES_LIMIT));
+      const repliesRef = collection(
+        db,
+        "users",
+        userId,
+        "posts",
+        postId,
+        "comments",
+        commentId,
+        "replies"
+      );
+      let q = query(
+        repliesRef,
+        orderBy("createdAt", "desc"),
+        limit(REPLIES_LIMIT)
+      );
 
       if (loadMore && lastVisible) {
-        q = query(repliesRef, orderBy("createdAt", "desc"), startAfter(lastVisible), limit(REPLIES_LIMIT));
+        q = query(
+          repliesRef,
+          orderBy("createdAt", "desc"),
+          startAfter(lastVisible),
+          limit(REPLIES_LIMIT)
+        );
       }
 
       const querySnapshot = await getDocs(q);
@@ -86,16 +128,21 @@ const ReplySection = ({
 
   const handleAddReply = async () => {
     if (!newComment.trim()) return;
-
     try {
-      // Fetch user details
       const userRef = doc(db, "users", currentUser.uid);
       const userDoc = await getDoc(userRef);
       if (userDoc.exists()) {
         const userData = userDoc.data();
-
-        // Add reply with user details
-        const repliesRef = collection(db, "users", userId, "posts", postId, "comments", commentId, "replies");
+        const repliesRef = collection(
+          db,
+          "users",
+          userId,
+          "posts",
+          postId,
+          "comments",
+          commentId,
+          "replies"
+        );
         await addDoc(repliesRef, {
           content: newComment,
           userId: currentUser.uid,
@@ -113,54 +160,57 @@ const ReplySection = ({
     }
   };
 
-  useEffect(() => {
-    if (showReplies) {
-      fetchReplies();
-    }
-  }, [showReplies]);
-
   return (
-    <div className="w-full mt-4">
-      <button
-        className="text-blue-500"
-        onClick={() => {
-          setShowReplies(!showReplies);
-          setActiveReply(commentId);
-        }}
-      >
-        {showReplies ? "Hide Replies" : "Show Replies"}
-      </button>
-      {showReplies && (
+    <div className="mt-4">
+      {!showReplies ? (
+        <button
+          className="text-blue-500"
+          onClick={() => {
+            setShowReplies(true);
+            setActiveReply(commentId);
+          }}
+        >
+          Show Replies
+        </button>
+      ) : (
         <>
-          {loading ? (
-            <p>Loading replies...</p>
-          ) : (
-            <div className="space-y-4">
-              {replies.map((reply) => (
-                <div key={reply.id} className="p-4 bg-gray-100 rounded-lg">
-                  <div className="flex items-center mb-2">
-                    <img src={reply.profilePic} alt={reply.username} className="w-8 h-8 rounded-full mr-2" />
-                    <p className="text-gray-700">{reply.username}</p>
-                  </div>
-                  <p className="text-gray-700">{reply.content}</p>
-                  <p className="text-gray-500 text-sm">
-                    {formatRelativeTime(reply.createdAt.seconds)}
-                  </p>
+          <button
+            className="text-blue-500"
+            onClick={() => {
+              setShowReplies(false);
+              setActiveReply(null);
+              setReplies([]);
+            }}
+          >
+            Hide Replies
+          </button>
+          <div className="space-y-4">
+            {replies.map((reply) => (
+              <div key={reply.id} className="p-4 bg-gray-100 rounded-lg">
+                <div className="flex items-center mb-2">
+                  <img
+                    src={reply.profilePic}
+                    alt={reply.username}
+                    className="w-8 h-8 rounded-full mr-2"
+                  />
+                  <p className="text-gray-700">{reply.username}</p>
                 </div>
-              ))}
-              {hasMoreReplies && (
-                <button
-                  className="text-blue-500"
-                  onClick={() => fetchReplies(true)}
-                >
-                  Load More Replies
-                </button>
-              )}
-            </div>
-          )}
+                <p className="text-gray-700">{reply.content}</p>
+                <p className="text-gray-500 text-sm">
+                  {formatRelativeTime(reply.createdAt.seconds)}
+                </p>
+              </div>
+            ))}
+            {hasMoreReplies && (
+              <button className="text-blue-500" onClick={() => fetchReplies(true)}>
+                Load More Replies
+              </button>
+            )}
+          </div>
           {activeReply === commentId && (
             <div className="mt-4 flex items-start">
               <textarea
+                ref={textareaRef}
                 className="w-full p-2 border border-gray-300 rounded-lg"
                 style={{
                   minHeight: "3rem",
@@ -169,11 +219,12 @@ const ReplySection = ({
                   overflowY: "hidden",
                 }}
                 placeholder="Add a reply..."
+                rows={1}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
               />
               <button
-                className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg"
+                className="ml-2 px-4 py-2 mt-1 bg-blue-500 text-white rounded-lg"
                 onClick={handleAddReply}
               >
                 {">"}

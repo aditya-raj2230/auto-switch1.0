@@ -18,13 +18,23 @@ const CommentSection = ({ userId, postId, currentUser }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
-  const [isReplyOpen, setIsReplyOpen] = useState(false);
   const [activeReply, setActiveReply] = useState(null);
   const [lastVisible, setLastVisible] = useState(null);
   const [hasMoreComments, setHasMoreComments] = useState(true);
   const COMMENTS_LIMIT = 5;
+  const textareaRef = useRef(null);
 
-  // Function to format relative time
+  useEffect(() => {
+    fetchComments();
+  }, [postId]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+    }
+  }, [newComment]);
+
   const formatRelativeTime = (timestampInSeconds) => {
     const currentTimestamp = Date.now() / 1000;
     const seconds = Math.floor(currentTimestamp - timestampInSeconds);
@@ -54,35 +64,17 @@ const CommentSection = ({ userId, postId, currentUser }) => {
       return `${interval} minute${interval === 1 ? "" : "s"} ago`;
     }
 
-    return `${Math.floor(seconds)} second${
-      Math.floor(seconds) === 1 ? "" : "s"
-    } ago`;
+    return `${Math.floor(seconds)} second${Math.floor(seconds) === 1 ? "" : "s"} ago`;
   };
 
   const fetchComments = async (loadMore = false) => {
     try {
       setLoading(true);
-      const commentsRef = collection(
-        db,
-        "users",
-        userId,
-        "posts",
-        postId,
-        "comments"
-      );
-      let q = query(
-        commentsRef,
-        orderBy("createdAt", "desc"),
-        limit(COMMENTS_LIMIT)
-      );
+      const commentsRef = collection(db, "users", userId, "posts", postId, "comments");
+      let q = query(commentsRef, orderBy("createdAt", "desc"), limit(COMMENTS_LIMIT));
 
       if (loadMore && lastVisible) {
-        q = query(
-          commentsRef,
-          orderBy("createdAt", "desc"),
-          startAfter(lastVisible),
-          limit(COMMENTS_LIMIT)
-        );
+        q = query(commentsRef, orderBy("createdAt", "desc"), startAfter(lastVisible), limit(COMMENTS_LIMIT));
       }
 
       const querySnapshot = await getDocs(q);
@@ -109,21 +101,11 @@ const CommentSection = ({ userId, postId, currentUser }) => {
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
     try {
-      // Fetch user details
       const userRef = doc(db, "users", currentUser.uid);
       const userDoc = await getDoc(userRef);
       if (userDoc.exists()) {
         const userData = userDoc.data();
-
-        // Add comment with user details
-        const commentsRef = collection(
-          db,
-          "users",
-          userId,
-          "posts",
-          postId,
-          "comments"
-        );
+        const commentsRef = collection(db, "users", userId, "posts", postId, "comments");
         await addDoc(commentsRef, {
           content: newComment,
           userId: currentUser.uid,
@@ -141,51 +123,28 @@ const CommentSection = ({ userId, postId, currentUser }) => {
     }
   };
 
-  useEffect(() => {
-    fetchComments();
-  }, [postId]);
-
-  const handleReplyOpen = (isOpen) => {
-    setIsReplyOpen(isOpen);
-  };
-
-  const textareaRef = useRef(null);
-
-  useEffect(() => {
-    // Adjust the height of the textarea based on the content
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
-    }
-  }, [newComment]);
-
   return (
     <div className="w-full mt-6">
       <h3 className="text-xl font-bold mb-4">Comments</h3>
-      {!isReplyOpen && (
-        <div className="mt-4 flex items-start">
+      <div className="mt-4 flex items-start">
         <textarea
           ref={textareaRef}
           className="w-full p-2 border border-gray-300 rounded-lg"
           style={{
-            minHeight: "3rem", // Minimum height to start with
-            lineHeight: "1.5", // Line height for consistent spacing
-            resize: "none", // Disable manual resizing
-            overflowY: "hidden", // Hide overflow to prevent scrollbar
+            minHeight: "3rem",
+            lineHeight: "1.5",
+            resize: "none",
+            overflowY: "hidden",
           }}
           placeholder="Add a comment..."
-          rows={1} // Initial rows, will dynamically adjust
+          rows={1}
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
         />
-        <button
-          className="ml-2 px-4 py-2 mt-1 bg-blue-500 text-white rounded-lg"
-          onClick={handleAddComment}
-        >
-         {">"}
+        <button className="ml-2 px-4 py-2 mt-1 bg-blue-500 text-white rounded-lg" onClick={handleAddComment}>
+          {">"}
         </button>
       </div>
-      )}
       {loading ? (
         <p>Loading comments...</p>
       ) : (
@@ -193,35 +152,26 @@ const CommentSection = ({ userId, postId, currentUser }) => {
           {comments.map((comment) => (
             <div key={comment.id} className="p-4 bg-gray-100 rounded-lg">
               <div className="flex items-center mb-2">
-                <img
-                  src={comment.profilePic}
-                  alt={comment.username}
-                  className="w-8 h-8 rounded-full mr-2"
-                />
+                <img src={comment.profilePic} alt={comment.username} className="w-8 h-8 rounded-full mr-2" />
                 <p className="text-gray-700">{comment.username}</p>
               </div>
               <p className="text-gray-700">{comment.content}</p>
-              <p className="text-gray-500 text-sm">
-                {formatRelativeTime(comment.createdAt.seconds)}
-              </p>
+              <p className="text-gray-500 text-sm">{formatRelativeTime(comment.createdAt.seconds)}</p>
               <ReplySection
-            userId={userId}
-            postId={postId}
-            commentId={comment.id}
-            currentUser={currentUser}
-            activeReply={activeReply}
-            setActiveReply={setActiveReply}
-            newComment={newComment}
-            setNewComment={setNewComment}
-            handleAddComment={handleAddComment}
-          />
+                userId={userId}
+                postId={postId}
+                commentId={comment.id}
+                currentUser={currentUser}
+                activeReply={activeReply}
+                setActiveReply={setActiveReply}
+                newComment={newComment}
+                setNewComment={setNewComment}
+                handleAddComment={handleAddComment}
+              />
             </div>
           ))}
           {hasMoreComments && (
-            <button
-              className="text-blue-500"
-              onClick={() => fetchComments(true)}
-            >
+            <button className="text-blue-500" onClick={() => fetchComments(true)}>
               Load More Comments
             </button>
           )}
