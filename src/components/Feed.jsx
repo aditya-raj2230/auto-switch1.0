@@ -12,10 +12,15 @@ const Feed = () => {
   return (
     <div>
       <UserProfile selectedUserId={userId} />
-      <button onClick={() => router.push('/addFriends')}>Add Friends</button>
+      <button ClassName="ml-4 bg-blue-500 text-white px-4 py-2 rounded" onClick={() => router.push('/addFriends')}>Add Friends</button>
       {userId && (
         <button onClick={() => router.push('/createPost')} className="ml-4 bg-blue-500 text-white px-4 py-2 rounded">
           Create Post
+        </button>
+      )}
+      {userId && (
+        <button onClick={() => router.push('/chat')} className="ml-4 bg-blue-500 text-white px-4 py-2 rounded">
+          Messages
         </button>
       )}
       <PublicPosts/>

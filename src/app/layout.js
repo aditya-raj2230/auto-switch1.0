@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
           <FollowProvider>
         <Navbar2 />
         <main className="relative overflow-hidden">{children}</main>
-        <Footer />
+       
         </FollowProvider>
         </AuthProvider>
       </body>
