@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc, doc } from "firebase/firestore";
 import { db } from "@/app/firebase/config";
 import { useAuth } from "../app/context/AuthContext";
 
@@ -16,14 +16,23 @@ const ChatRoom = ({ chatRoomId, selectedUser, onSendMessage, loggedInUser }) => 
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setMessages(snapshot.docs.map(doc => ({
+      const newMessages = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      })));
+      }));
+      setMessages(newMessages);
+
+      // Mark messages as seen if they are not sent by the current user
+      const unseenMessages = newMessages.filter(msg => msg.senderId !== userId && !msg.seen);
+      unseenMessages.forEach(async (msg) => {
+        await updateDoc(doc(db, `chatRooms/${chatRoomId}/messages/${msg.id}`), {
+          seen: true
+        });
+      });
     });
 
     return () => unsubscribe();
-  }, [chatRoomId]);
+  }, [chatRoomId, userId]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -37,7 +46,8 @@ const ChatRoom = ({ chatRoomId, selectedUser, onSendMessage, loggedInUser }) => 
     await addDoc(collection(db, `chatRooms/${chatRoomId}/messages`), {
       senderId: userId,
       text: newMessage,
-      timestamp: serverTimestamp()
+      timestamp: serverTimestamp(),
+      seen: false // Mark as unseen by default
     });
 
     setNewMessage('');

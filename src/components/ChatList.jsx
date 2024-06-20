@@ -19,6 +19,27 @@ const fetchUserData = async (userId) => {
   return null;
 };
 
+// Function to count unseen messages for a chat room
+const countUnseenMessages = async (chatRoomId, userId) => {
+  try {
+    const messagesRef = collection(db, `chatRooms/${chatRoomId}/messages`);
+    const querySnapshot = await getDocs(messagesRef);
+    let unseenCount = 0;
+
+    querySnapshot.forEach((doc) => {
+      const message = doc.data();
+      if (!message.seen && message.senderId !== userId) {
+        unseenCount++;
+      }
+    });
+
+    return unseenCount;
+  } catch (error) {
+    console.error("Error counting unseen messages:", error);
+    return 0;
+  }
+};
+
 const ChatList = () => {
   const { user } = useAuth();
   const userId = user?.uid;
@@ -40,20 +61,35 @@ const ChatList = () => {
     fetchLoggedInUserData();
   }, [userId]);
 
+  const markMessagesAsSeen = async (chatRoomId, userId) => {
+    const messagesRef = collection(db, `chatRooms/${chatRoomId}/messages`);
+    const querySnapshot = await getDocs(messagesRef);
+
+    querySnapshot.forEach((doc) => {
+      const message = doc.data();
+      if (!message.seen && message.senderId !== userId) {
+        setDoc(doc.ref, { seen: true }, { merge: true });
+      }
+    });
+  };
+
   useEffect(() => {
     const fetchChatUsers = async () => {
       try {
-        const q = query(collection(db, `users/${userId}/chats`), orderBy("lastMessageTimestamp", "desc"));
+        const q = query(collection(db, `users/${userId}/chats`));
         const unsubscribe = onSnapshot(q, async (querySnapshot) => {
           const chatUsers = await Promise.all(querySnapshot.docs.map(async (doc) => {
             const userData = await fetchUserData(doc.id);
+            const chatRoomId = createChatRoomId(userId, doc.id);
+            const unseenCount = await countUnseenMessages(chatRoomId, userId);
             return {
               id: doc.id,
               ...userData,
-              ...doc.data()
+              ...doc.data(),
+              unseenCount
             };
           }));
-          setUsers(chatUsers);
+          setUsers(chatUsers.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp));
         });
 
         return unsubscribe;
@@ -100,6 +136,7 @@ const ChatList = () => {
 
     setSelectedUser(userData);
 
+    await markMessagesAsSeen(chatRoomId, userId);
     // Clear the search query and results
     setSearchQuery('');
     setSearchResults([]);
@@ -166,8 +203,15 @@ const ChatList = () => {
             <div key={user.id} onClick={() => handleUserClick(user)} className="p-4 cursor-pointer hover:bg-gray-200">
               <div className="flex items-center">
                 <img src={user.profileImageUrl} alt={user.firstName} className="w-10 h-10 rounded-full mr-4" />
-                <div>
-                  <p className="font-semibold">{user.firstName} {user.lastName}</p>
+                <div className="flex-1">
+                  <div className="flex justify-between items-center">
+                    <p className="font-semibold">{user.firstName} {user.lastName}</p>
+                    {user.unseenCount > 0 && (
+                      <span className="ml-2 text-xs text-red-500 font-semibold">
+                        {user.unseenCount}
+                      </span>
+                    )}
+                  </div>
                   {user.lastMessage && (
                     <div className="flex items-center mt-1">
                       <p className="text-sm text-gray-600">{user.lastMessage.senderId === userId ? 'You' : user.firstName}: {user.lastMessage.text}</p>
