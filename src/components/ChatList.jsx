@@ -27,6 +27,18 @@ const ChatList = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [loggedInUser, setLoggedInUser] = useState(null);
+
+  useEffect(() => {
+    const fetchLoggedInUserData = async () => {
+      if (userId) {
+        const userData = await fetchUserData(userId);
+        setLoggedInUser(userData);
+      }
+    };
+
+    fetchLoggedInUserData();
+  }, [userId]);
 
   useEffect(() => {
     const fetchChatUsers = async () => {
@@ -43,6 +55,7 @@ const ChatList = () => {
           }));
           setUsers(chatUsers);
         });
+
         return unsubscribe;
       } catch (error) {
         console.error("Error fetching chat users:", error);
@@ -87,12 +100,6 @@ const ChatList = () => {
 
     setSelectedUser(userData);
 
-    // Ensure all required fields are defined
-    if (!userData.firstName || !userData.lastName || !userData.profileImageUrl) {
-      console.error('User data is incomplete', userData);
-      return;
-    }
-
     // Clear the search query and results
     setSearchQuery('');
     setSearchResults([]);
@@ -104,10 +111,9 @@ const ChatList = () => {
     const chatRoomId = createChatRoomId(userId, selectedUser.id);
     const messageTimestamp = new Date();
 
-    // Fetch the logged in user's data
-    const loggedInUserData = await fetchUserData(userId);
+    const loggedInUserData = loggedInUser;
 
-    const loggedInUser = {
+    const loggedInUserDetails = {
       id: userId,
       firstName: loggedInUserData?.firstName || 'Unknown',
       lastName: loggedInUserData?.lastName || 'User',
@@ -132,11 +138,10 @@ const ChatList = () => {
         timestamp: messageTimestamp
       }
     };
-    
 
     // Update both users' chat lists
     await setDoc(doc(db, `users/${userId}/chats`, chatRoomId), selectedChatUser, { merge: true });
-    await setDoc(doc(db, `users/${selectedUser.id}/chats`, chatRoomId), loggedInUser, { merge: true });
+    await setDoc(doc(db, `users/${selectedUser.id}/chats`, chatRoomId), loggedInUserDetails, { merge: true });
   };
 
   const createChatRoomId = (userId1, userId2) => {
@@ -144,7 +149,7 @@ const ChatList = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-full w-full">
       <div className="w-1/3 border-r border-gray-300 flex flex-col relative">
         <div className="bg-gray-200 p-4">
           <h1 className="text-3xl font-bold">Chats</h1>
@@ -179,7 +184,9 @@ const ChatList = () => {
       </div>
       <div className="w-2/3 bg-white flex flex-col">
         {selectedChatRoomId ? (
-          <ChatRoom chatRoomId={selectedChatRoomId} selectedUser={selectedUser} onSendMessage={handleSendMessage} />
+          <div className="h-full w-full">
+            <ChatRoom chatRoomId={selectedChatRoomId} selectedUser={selectedUser} onSendMessage={handleSendMessage} loggedInUser={loggedInUser} />
+          </div>
         ) : (
           <div className="border-b border-gray-300 p-4">
             <h1 className="text-3xl font-bold">Select a chat</h1>
