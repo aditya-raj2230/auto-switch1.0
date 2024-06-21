@@ -1,5 +1,4 @@
-// src/components/Navbar2.jsx
-"use client";
+'use client'
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -26,7 +25,7 @@ const Navbar2 = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      router.push('/');
+      router.push("/");
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -47,14 +46,12 @@ const Navbar2 = () => {
         {user ? (
           <>
             <li>
-              <Link href={`/`}>
-                Profile
-              </Link>
+              <Link href={`/`}>Profile</Link>
             </li>
             <li>
               <button
                 onClick={handleLogout}
-                className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2"
+                className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-drab-dark-brown hover:text-white hover:bg-drab-dark-brown"
               >
                 Logout
               </button>
@@ -64,14 +61,14 @@ const Navbar2 = () => {
           <>
             <li>
               <Link href="/auth/signup">
-                <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2">
+                <button className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-drab-dark-brown hover:text-white hover:bg-drab-dark-brown">
                   Sign Up
                 </button>
               </Link>
             </li>
             <li>
               <Link href="/auth/login">
-                <button className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2">
+                <button className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-drab-dark-brown hover:text-white hover:bg-drab-dark-brown">
                   Login
                 </button>
               </Link>
@@ -103,14 +100,12 @@ const Navbar2 = () => {
             {user ? (
               <>
                 <li>
-                  <Link href={`/`}>
-                    Profile
-                  </Link>
+                  <Link href={`/`}>Profile</Link>
                 </li>
                 <li>
                   <button
                     onClick={handleLogout}
-                    className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2"
+                    className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-drab-dark-brown hover:text-white hover:bg-drab-dark-brown"
                   >
                     Logout
                   </button>
@@ -121,7 +116,7 @@ const Navbar2 = () => {
                 <li>
                   <Link href="/auth/signup">
                     <button
-                      className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2"
+                      className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-drab-dark-brown hover:text-white hover:bg-drab-dark-brown"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Sign Up
@@ -131,7 +126,7 @@ const Navbar2 = () => {
                 <li>
                   <Link href="/auth/login">
                     <button
-                      className="bg-white border-2 group border-black hover:border-black hover:text-white rounded-full hover:bg-black px-5 py-2"
+                      className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-drab-dark-brown hover:text-white hover:bg-drab-dark-brown"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Login
