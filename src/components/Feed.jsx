@@ -1,9 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import UserProfile from "@/components/Profile";
-import PublicPosts from "./PublicPosts";
 import { useAuth } from "../app/context/AuthContext";
+import PublicPosts from "./PublicPosts";
 import CreatePostForm from "./CreatePost";
 
 const Feed = () => {
@@ -19,13 +17,16 @@ const Feed = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative flex flex-col">
       {user && (
-        <div onClick={handleExpand} className="">
-          <CreatePostForm isExpanded={isExpanded} onClose={handleCollapse} />
+        <div>
+          <CreatePostForm
+            isExpanded={isExpanded}
+            onClose={handleCollapse}
+            onExpand={handleExpand}
+          />
         </div>
       )}
-
       <PublicPosts />
     </div>
   );

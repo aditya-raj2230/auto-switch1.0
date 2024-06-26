@@ -6,7 +6,7 @@ import { collection, addDoc, doc } from "firebase/firestore";
 import { useAuth } from "../app/context/AuthContext"; // Assuming you have an Auth context to get the current user
 import { useRouter } from "next/navigation";
 
-const CreatePostForm = ({ isExpanded, onClose }) => {
+const CreatePostForm = ({ isExpanded, onClose, onExpand }) => {
   const { user } = useAuth(); // Get the current logged-in user
   const [content, setContent] = useState('');
   const [imageFile, setImageFile] = useState(null);
@@ -51,12 +51,18 @@ const CreatePostForm = ({ isExpanded, onClose }) => {
       setContent("");
       setImageFile(null);
       setImagePreview('');
-      console.log("done posting");
       router.push('/'); // Uncomment if you have a router setup
     } catch (error) {
       console.error("Error creating post:", error);
     }
     setLoading(false);
+  };
+
+  const handleClickInside = (event) => {
+    event.stopPropagation();
+    if (!isExpanded) {
+      onExpand();
+    }
   };
 
   const handleClickOutside = (event) => {
@@ -78,9 +84,10 @@ const CreatePostForm = ({ isExpanded, onClose }) => {
 
   return (
     <div
-      className={`transition-all duration-300 ease-in-out ${
-        isExpanded ? "fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50" : ""
+      className={`transition-all duration-300  ease-in-out ${
+        isExpanded ? "fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 " : ""
       }`}
+      onClick={handleClickInside}
     >
       <div
         ref={formRef}
