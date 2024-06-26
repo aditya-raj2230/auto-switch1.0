@@ -73,7 +73,60 @@ const Navbar2 = () => {
         {user && isVerified ? (
           <>
             <li>
-              <Link href={`/`}>Profile</Link>
+              <Link href="/">
+                <Image
+                  src="/home.png"
+                  alt="Home"
+                  width={30}
+                  height={30}
+                  className="cursor-pointer"
+                />
+              </Link>
+            </li>
+            <li>
+              <Link href="/addFriends">
+                <Image
+                  src="/users-alt.png"
+                  alt="My Network"
+                  width={30}
+                  height={30}
+                  className="cursor-pointer"
+                />
+              </Link>
+            </li>
+           
+            <li>
+              <Link href="/chat">
+                <Image
+                  src="/paper-plane.png"
+                  alt="Messaging"
+                  width={30}
+                  height={30}
+                  className="cursor-pointer"
+                />
+              </Link>
+            </li>
+            <li>
+              <Link href="/notifications">
+                <Image
+                  src="/bell.png"
+                  alt="Notifications"
+                  width={30}
+                  height={30}
+                  className="cursor-pointer"
+                />
+              </Link>
+            </li>
+            <li>
+              <Link href="/profile">
+                <Image
+                  src="/user.png"
+                  alt="Me"
+                  width={30}
+                  height={30}
+                  className="cursor-pointer"
+                />
+              </Link>
             </li>
             <li>
               <button
@@ -127,7 +180,70 @@ const Navbar2 = () => {
             {user && isVerified ? (
               <>
                 <li>
-                  <Link href={`/`}>Profile</Link>
+                  <Link href="/">
+                    <Image
+                      src="/images/home.png"
+                      alt="Home"
+                      width={30}
+                      height={30}
+                      className="cursor-pointer"
+                    />
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/network">
+                    <Image
+                      src="/images/network.png"
+                      alt="My Network"
+                      width={30}
+                      height={30}
+                      className="cursor-pointer"
+                    />
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/jobs">
+                    <Image
+                      src="/images/jobs.png"
+                      alt="Jobs"
+                      width={30}
+                      height={30}
+                      className="cursor-pointer"
+                    />
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/messaging">
+                    <Image
+                      src="/images/messaging.png"
+                      alt="Messaging"
+                      width={30}
+                      height={30}
+                      className="cursor-pointer"
+                    />
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/notifications">
+                    <Image
+                      src="/images/notifications.png"
+                      alt="Notifications"
+                      width={30}
+                      height={30}
+                      className="cursor-pointer"
+                    />
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/profile">
+                    <Image
+                      src="/images/profile.png"
+                      alt="Me"
+                      width={30}
+                      height={30}
+                      className="cursor-pointer"
+                    />
+                  </Link>
                 </li>
                 <li>
                   <button
