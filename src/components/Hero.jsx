@@ -11,7 +11,7 @@ const Hero = () => {
           Join the<span> Motor Community</span>
         </h1>
         <Carousel
-          autoPlay
+          autoPlaych
           infiniteLoop
           showThumbs={false}
           showStatus={false}
