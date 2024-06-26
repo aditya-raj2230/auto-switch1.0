@@ -1,14 +1,15 @@
-'use client'
+'use client';
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { signOut } from "firebase/auth";
+import { signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/app/firebase/config";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext"; // Import the AuthContext
 
 const Navbar2 = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
   const router = useRouter();
   const { user } = useAuth();
 
@@ -17,6 +18,32 @@ const Navbar2 = () => {
       console.log(user.uid, "User ID");
     }
   }, [user]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser && currentUser.emailVerified) {
+        setIsVerified(true);
+      } else {
+        setIsVerified(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isVerified && user) {
+        onAuthStateChanged(auth, (currentUser) => {
+          if (currentUser && currentUser.emailVerified) {
+            setIsVerified(true);
+          }
+        });
+      }
+    }, 10000); // Check every 10 seconds
+
+    return () => clearInterval(interval); // Clean up the interval on component unmount
+  }, [isVerified, user]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -43,7 +70,7 @@ const Navbar2 = () => {
         />
       </Link>
       <ul className="hidden h-full gap-12 lg:flex m-4">
-        {user ? (
+        {user && isVerified ? (
           <>
             <li>
               <Link href={`/`}>Profile</Link>
@@ -97,7 +124,7 @@ const Navbar2 = () => {
             &times;
           </button>
           <ul className="flex flex-col items-center gap-4 mt-8">
-            {user ? (
+            {user && isVerified ? (
               <>
                 <li>
                   <Link href={`/`}>Profile</Link>

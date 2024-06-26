@@ -7,6 +7,7 @@ import { auth } from "@/app/firebase/config";  // Adjust the import path accordi
 
 import Image from "next/image";
 import SignupForm from "@/components/SignupForm";
+import AuthGuard from "@/components/AuthGaurd";
 
 
 export default function SignupPage() {
@@ -32,6 +33,7 @@ export default function SignupPage() {
   }
 
   return (
+    <AuthGuard>
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="container bg-white-100 shadow-md rounded-lg p-6">
         <Image
@@ -44,5 +46,6 @@ export default function SignupPage() {
         <SignupForm />
       </div>
     </div>
+    </AuthGuard>
   );
 }
