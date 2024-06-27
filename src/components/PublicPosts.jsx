@@ -3,11 +3,17 @@ import { db } from "@/app/firebase/config"; // Update with your Firebase configu
 import { collection, getDocs, doc, updateDoc, arrayUnion, arrayRemove, onSnapshot, getDoc } from "firebase/firestore";
 import { useAuth } from '../app/context/AuthContext'; // Assuming you have an Auth context to get the current user
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const PublicPosts = () => {
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter()
+
+  const handleProfileClick = (userId) => {
+    router.push(`/addFriends/${userId}`);
+  };
 
   const fetchPosts = async () => {
     try {
@@ -111,16 +117,17 @@ const PublicPosts = () => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4">
+    <div className="w-full max-w-3xl flex flex-col items-center">
       {loading ? (
         <p>Loading posts...</p>
       ) : (
         posts.map((post) => (
           <div
             key={post.id}
-            className="w-1/3 h-auto max-w-full p-6 bg-white shadow-md rounded-lg overflow-hidden"
+            className="w-full p-6 bg-white shadow-md rounded-lg mb-4"
+            
           >
-            <div className="flex items-center mb-4">
+            <div className="flex items-center mb-4 cursor-pointer" onClick={() => handleProfileClick(post.userId)}>
               <img
                 src={post.profileImageUrl}
                 alt="Profile"
@@ -135,7 +142,7 @@ const PublicPosts = () => {
                 </p>
               </div>
             </div>
-            <p className="mb-4 overflow-hidden overflow-ellipsis">{post.content}</p>
+            <p className="mb-4">{post.content}</p>
             {post.imageUrl && (
               <img src={post.imageUrl} alt="Post" className="mt-4 rounded-lg max-h-64 w-full object-cover" />
             )}

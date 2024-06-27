@@ -18,10 +18,11 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <AuthProvider>
           <FollowProvider>
-        <Navbar2 />
-        <main className="relative overflow-hidden">{children}</main>
-       
-        </FollowProvider>
+            <div className="flex md:flex-col min-h-screen flex-col-reverse">
+              <Navbar2 className="md:order-first fixed top-0 left-0 right-0 z-50 bg-white shadow-md" />
+              <main className="relative overflow-hidden flex-1">{children}</main>
+            </div>
+          </FollowProvider>
         </AuthProvider>
       </body>
     </html>

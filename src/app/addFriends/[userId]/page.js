@@ -1,4 +1,6 @@
 'use client'
+
+import AuthGuard2 from '@/components/LoggedOutAuthGaurad'
 // pages/profile/[userId].js
 import SelectedUserProfile from '@/components/selectedUserProfile'
 import React, { useEffect, useState } from 'react'
@@ -19,10 +21,12 @@ export default function Page ({params}){
   }, [params.userId])
 
   return (
+    <AuthGuard2>
     <div>
 
       <SelectedUserProfile selectedUserId={id} />
     </div>
+    </AuthGuard2>
   )
 }
 

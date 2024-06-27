@@ -84,18 +84,18 @@ const CreatePostForm = ({ isExpanded, onClose, onExpand }) => {
 
   return (
     <div
-      className={`transition-all duration-300  ease-in-out ${
-        isExpanded ? "fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 " : ""
+      className={`transition-all duration-300 ease-in-out ${
+        isExpanded ? "fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50" : ""
       }`}
       onClick={handleClickInside}
     >
       <div
         ref={formRef}
-        className={`p-4 bg-white shadow-md rounded-lg max-w-lg mx-auto mt-8 ${
-          isExpanded ? "w-3/4 lg:w-1/2" : ""
+        className={`p-4 bg-white shadow-md rounded-lg w-full ${
+          isExpanded ? "max-w-3xl mx-auto mt-8" : ""
         }`}
       >
-        <h2 className="text-2xl font-bold mb-4 text-blue-600">Create Post</h2>
+        <h2 className="text-2xl font-bold mb-4 text-green-600">Create Post</h2>
         <form onSubmit={handleSubmit}>
           <textarea
             value={content}

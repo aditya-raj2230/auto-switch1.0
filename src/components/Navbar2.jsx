@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -59,12 +59,12 @@ const Navbar2 = () => {
   };
 
   return (
-    <nav className="flex flex-row top-0 z-30 justify-between px-10 py-2 w-screen sticky bg-white">
+    <nav className="flex flex-row top-0 z-30 justify-between px-10 py-2 w-screen sticky bg-green-50 border-2 border-gray-400 ">
       <Link href="/">
         <Image
-          src="/newLogo.png"
+          src="/newLogo-removebg-preview.png"
           alt="logo"
-          width={400}
+          width={250}
           height={100}
           className="m-0 p-0"
         />
@@ -94,7 +94,7 @@ const Navbar2 = () => {
                 />
               </Link>
             </li>
-           
+
             <li>
               <Link href="/chat">
                 <Image
@@ -117,24 +117,29 @@ const Navbar2 = () => {
                 />
               </Link>
             </li>
-            <li>
-              <Link href="/profile">
-                <Image
-                  src="/user.png"
-                  alt="Me"
-                  width={30}
-                  height={30}
-                  className="cursor-pointer"
-                />
-              </Link>
-            </li>
-            <li>
-              <button
-                onClick={handleLogout}
-                className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-drab-dark-brown hover:text-white hover:bg-drab-dark-brown"
-              >
-                Logout
-              </button>
+            <li className="relative group ">
+              <Image
+                src="/user.png"
+                alt="Me"
+                width={30}
+                height={30}
+                className="cursor-pointer mb-2"
+              />
+
+              <div className="absolute left-1/2 transform -translate-x-1/2  hidden group-hover:block bg-white shadow-lg rounded-lg  w-32 ">
+                <Link
+                  href="/profile"
+                  className="bg-green-500 text-white px-5 py-2 rounded-t-lg border-b-0 border-2 border-green-700 block whitespace-nowrap hover:bg-green-700"
+                >
+                  View Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="bg-green-500 text-white px-5 py-2 w-32 rounded-b-lg border-2 border-green-700 block whitespace-nowrap hover:bg-green-700"
+                >
+                  Logout
+                </button>
+              </div>
             </li>
           </>
         ) : (
@@ -182,7 +187,7 @@ const Navbar2 = () => {
                 <li>
                   <Link href="/">
                     <Image
-                      src="/images/home.png"
+                      src="/home.png"
                       alt="Home"
                       width={30}
                       height={30}
@@ -191,9 +196,9 @@ const Navbar2 = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/network">
+                  <Link href="/addFriends">
                     <Image
-                      src="/images/network.png"
+                      src="/users-alt.png"
                       alt="My Network"
                       width={30}
                       height={30}
@@ -201,21 +206,11 @@ const Navbar2 = () => {
                     />
                   </Link>
                 </li>
+             
                 <li>
-                  <Link href="/jobs">
+                  <Link href="/chat">
                     <Image
-                      src="/images/jobs.png"
-                      alt="Jobs"
-                      width={30}
-                      height={30}
-                      className="cursor-pointer"
-                    />
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/messaging">
-                    <Image
-                      src="/images/messaging.png"
+                      src="/paper-plane.png"
                       alt="Messaging"
                       width={30}
                       height={30}
@@ -226,7 +221,7 @@ const Navbar2 = () => {
                 <li>
                   <Link href="/notifications">
                     <Image
-                      src="/images/notifications.png"
+                      src="/bell.png"
                       alt="Notifications"
                       width={30}
                       height={30}
@@ -234,24 +229,28 @@ const Navbar2 = () => {
                     />
                   </Link>
                 </li>
-                <li>
-                  <Link href="/profile">
-                    <Image
-                      src="/images/profile.png"
-                      alt="Me"
-                      width={30}
-                      height={30}
-                      className="cursor-pointer"
-                    />
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    onClick={handleLogout}
-                    className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-drab-dark-brown hover:text-white hover:bg-drab-dark-brown"
-                  >
-                    Logout
-                  </button>
+                <li className="relative group">
+                  <Image
+                    src="/user.png"
+                    alt="Me"
+                    width={30}
+                    height={30}
+                    className="cursor-pointer"
+                  />
+                  <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-lg mt-2">
+                    <Link
+                      href="/profile"
+                      className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-t-lg border-b-2 border-drab-dark-brown w-full text-left hover:text-white hover:bg-drab-dark-brown"
+                    >
+                      View Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-b-lg border-2 border-drab-dark-brown w-full text-left hover:text-white hover:bg-drab-dark-brown"
+                    >
+                      Logout
+                    </button>
+                  </div>
                 </li>
               </>
             ) : (

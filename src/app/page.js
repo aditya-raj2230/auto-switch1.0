@@ -27,7 +27,7 @@ export default function Home() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div>
+    <div className="bg-white">
       {user && user.emailVerified ? <Feed /> : <Hero />}
     </div>
   );
