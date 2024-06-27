@@ -66,13 +66,13 @@ const ChatRoom = ({ chatRoomId, selectedUser, onSendMessage, loggedInUser }) => 
         <img src={selectedUser?.profileImageUrl || ''} alt={selectedUser?.firstName || 'Unknown'} className="w-10 h-10 rounded-full mr-4" />
         <h1 className="text-2xl font-bold">{selectedUser?.firstName || 'Unknown'} {selectedUser?.lastName || 'User'}</h1>
       </div>
-      <div className="flex-grow overflow-y-auto bg-gray-100 p-4">
+      <div className="flex-grow overflow-y-auto bg-white p-4">
         {messages.map(message => (
           <div key={message.id} className={`flex items-end mb-4 ${message.senderId === userId ? 'justify-end' : 'justify-start'}`}>
             {message.senderId !== userId && (
               <img src={selectedUser?.profileImageUrl || ''} alt={selectedUser?.firstName || 'Unknown'} className="w-8 h-8 rounded-full mr-2" />
             )}
-            <div className={`p-3 rounded-lg ${message.senderId === userId ? 'bg-blue-500 text-white self-end' : 'bg-gray-200 text-gray-700 self-start'}`}>
+            <div className={`p-3 rounded-lg ${message.senderId === userId ? 'bg-green-500 text-white self-end' : 'bg-gray-200 text-gray-700 self-start'}`}>
               <p className="text-sm">{message.text}</p>
             </div>
             {message.senderId === userId && (
@@ -88,10 +88,10 @@ const ChatRoom = ({ chatRoomId, selectedUser, onSendMessage, loggedInUser }) => 
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type a message..."
-          className="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:border-blue-500"
+          className="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:border-green-500"
           onKeyPress={handleKeyPress}
         />
-        <button onClick={handleSendMessage} className="bg-blue-500 text-white px-4 py-2 rounded-r-lg ml-2 hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
+        <button onClick={handleSendMessage} className="bg-green-500 text-white px-4 py-2 rounded-r-lg ml-2 hover:bg-green-600 focus:outline-none focus:bg-green-600">
           Send
         </button>
       </div>

@@ -1,4 +1,3 @@
-// components/UserList.js
 'use client'
 import React, { useState, useEffect } from "react";
 import { collection, query, orderBy, limit, startAfter, getDocs, where } from "firebase/firestore";
@@ -144,18 +143,19 @@ const UserList = () => {
   };
 
   return (
-    <div>
+    <div className="container mx-auto p-4">
+      <div className="text-2xl font-bold mb-4 text-green-600">Discover</div>
       <div className="mb-4">
         <input
           type="text"
           placeholder="Search by first name or display name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-lg"
+          className="w-full p-2 border border-green-500 rounded-lg focus:outline-none focus:border-green-300"
         />
       </div>
       {loading ? (
-        <div>Loading...</div>
+        <div className="text-center">Loading...</div>
       ) : (
         <>
           <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -163,7 +163,7 @@ const UserList = () => {
               <li
                 key={user.id}
                 onClick={() => handleProfileClick(user.id)}
-                className="border border-gray-200 rounded-lg p-4 cursor-pointer hover:shadow-md"
+                className="border border-green-200 rounded-lg p-4 cursor-pointer hover:shadow-md h-48 hover:border-4 hover:border-green-300 overflow-hidden"
               >
                 {user.profileImageUrl ? (
                   <img
@@ -174,10 +174,10 @@ const UserList = () => {
                 ) : (
                   <div className="w-20 h-20 rounded-full bg-gray-300 mx-auto mb-4"></div>
                 )}
-                <h2 className="text-xl font-bold text-center">
+                <h2 className="text-xl font-bold text-center text-black truncate">
                   {user.firstName} {user.lastName}
                 </h2>
-                <p className="text-gray-600 text-center">{user.bio}</p>
+                <p className="text-gray-600 text-center truncate">{user.bio}</p>
               </li>
             ))}
           </ul>
@@ -185,7 +185,7 @@ const UserList = () => {
             <div className="text-center mt-6">
               <button
                 onClick={fetchMoreUsers}
-                className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-800"
+                className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 focus:outline-none"
               >
                 Load More
               </button>

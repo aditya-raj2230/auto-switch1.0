@@ -18,8 +18,10 @@ export default function Page ({params}){
 
   useEffect(() => {
     setId(params.userId)
+    
   }, [params.userId])
 
+  
   return (
     <AuthGuard2>
     <div>

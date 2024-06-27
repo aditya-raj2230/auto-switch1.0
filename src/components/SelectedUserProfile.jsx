@@ -7,6 +7,7 @@ import { db } from "@/app/firebase/config";
 import { useFollow } from "../app/context/FollowContext"; // Import the FollowContext
 import { useAuth } from "../app/context/AuthContext"; // Import the AuthContext
 import VehicleList from "./VehicleList";
+import Link from "next/link";
 
 const SelectedUserProfile = ({ selectedUserId }) => {
   const [userData, setUserData] = useState(null);
@@ -125,11 +126,11 @@ const SelectedUserProfile = ({ selectedUserId }) => {
         <div className="flex justify-center space-x-8 my-6">
           <div>
             <p className="text-gray-900 font-bold text-xl">{userData.followerCount}</p>
-            <p className="text-gray-600 text-xl">Followers</p>
+            <Link href={`/addFriends/${selectedUserId}/followers`} className="text-gray-600 text-xl cursor-pointer">Followers</Link>
           </div>
           <div>
             <p className="text-gray-900 font-bold text-xl">{userData.followingCount}</p>
-            <p className="text-gray-600 text-xl">Following</p>
+            <Link href={`/addFriends/${selectedUserId}/following`} className="text-gray-600 text-xl cursor-pointer">Following</Link>
           </div>
         </div>
 

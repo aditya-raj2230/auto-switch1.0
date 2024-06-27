@@ -19,6 +19,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-firebase-hooks": "^5.1.1",
+    "react-masonry-css": "^1.0.16",
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^6.23.1",
     "react-slick": "^0.30.2",

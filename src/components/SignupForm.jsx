@@ -36,7 +36,7 @@ export default function SignupForm() {
         lastName,
         email,
         createdAt: new Date(),
-        profileImageUrl: null,
+        profileImageUrl: '/user.png',
         bannerImageUrl: null,
         bio: "",
         vehicles: [],
