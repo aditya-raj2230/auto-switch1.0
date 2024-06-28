@@ -103,6 +103,17 @@ const Navbar2 = () => {
               </Link>
             </li>
             <li>
+              <Link href="/marketPlace">
+                <Image
+                  src="/car(1).png"
+                  alt="My Network"
+                  width={30}
+                  height={30}
+                  className="cursor-pointer"
+                />
+              </Link>
+            </li>
+            <li>
               <Link href="/addFriends">
                 <Image
                   src="/users-alt.png"
