@@ -3,13 +3,15 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { signOut, onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/app/firebase/config";
+import { auth, db } from "@/app/firebase/config"; // Ensure the db is imported
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext"; // Import the AuthContext
 
 const Navbar2 = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const router = useRouter();
   const { user } = useAuth();
 
@@ -45,6 +47,23 @@ const Navbar2 = () => {
     return () => clearInterval(interval); // Clean up the interval on component unmount
   }, [isVerified, user]);
 
+  useEffect(() => {
+    if (user) {
+      const notificationsRef = collection(db, "users", user.uid, "notifications");
+      const q = query(notificationsRef, where("read", "==", false));
+
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        if (!snapshot.empty) {
+          setHasUnreadNotifications(true);
+        } else {
+          setHasUnreadNotifications(false);
+        }
+      });
+
+      return () => unsubscribe();
+    }
+  }, [user]);
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -59,7 +78,7 @@ const Navbar2 = () => {
   };
 
   return (
-    <nav className="flex flex-row top-0 z-30 justify-between px-10 py-2 w-screen sticky bg-green-50 border-2 border-gray-400 ">
+    <nav className="flex flex-row top-0 z-30 justify-between px-10 py-2 w-screen sticky bg-green-50 border-2 border-gray-400">
       <Link href="/">
         <Image
           src="/newLogo-removebg-preview.png"
@@ -94,7 +113,6 @@ const Navbar2 = () => {
                 />
               </Link>
             </li>
-
             <li>
               <Link href="/chat">
                 <Image
@@ -109,7 +127,7 @@ const Navbar2 = () => {
             <li>
               <Link href="/notifications">
                 <Image
-                  src="/bell.png"
+                  src={hasUnreadNotifications ? "/notification2.png" : "/bell.png"}
                   alt="Notifications"
                   width={30}
                   height={30}
@@ -117,7 +135,7 @@ const Navbar2 = () => {
                 />
               </Link>
             </li>
-            <li className="relative group ">
+            <li className="relative group">
               <Image
                 src="/user.png"
                 alt="Me"
@@ -125,8 +143,7 @@ const Navbar2 = () => {
                 height={30}
                 className="cursor-pointer mb-2"
               />
-
-              <div className="absolute left-1/2 transform -translate-x-1/2  hidden group-hover:block bg-white shadow-lg rounded-lg  w-32 ">
+              <div className="absolute left-1/2 transform -translate-x-1/2 hidden group-hover:block bg-white shadow-lg rounded-lg w-32">
                 <Link
                   href="/profile"
                   className="bg-green-500 text-white px-5 py-2 rounded-t-lg border-b-0 border-2 border-green-700 block whitespace-nowrap hover:bg-green-700"
@@ -206,7 +223,6 @@ const Navbar2 = () => {
                     />
                   </Link>
                 </li>
-             
                 <li>
                   <Link href="/chat">
                     <Image
@@ -221,7 +237,7 @@ const Navbar2 = () => {
                 <li>
                   <Link href="/notifications">
                     <Image
-                      src="/bell.png"
+                      src={hasUnreadNotifications ? "/notification2.png" : "/bell.png"}
                       alt="Notifications"
                       width={30}
                       height={30}
