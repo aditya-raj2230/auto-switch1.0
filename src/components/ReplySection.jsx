@@ -125,14 +125,17 @@ const ReplySection = ({
       setLoading(false);
     }
   };
-
   const handleAddReply = async () => {
     if (!newComment.trim()) return;
     try {
+      console.log("Fetching current user data...");
       const userRef = doc(db, "users", currentUser.uid);
       const userDoc = await getDoc(userRef);
+  
       if (userDoc.exists()) {
         const userData = userDoc.data();
+        console.log("Current user data fetched:", userData);
+  
         const repliesRef = collection(
           db,
           "users",
@@ -150,6 +153,47 @@ const ReplySection = ({
           profilePic: userData.profileImageUrl,
           createdAt: serverTimestamp(),
         });
+  
+        console.log("Reply added successfully.");
+  
+        // Send notification to comment owner
+        const commentRef = doc(db, "users", userId, "posts", postId, "comments", commentId);
+        const commentDoc = await getDoc(commentRef);
+  
+        if (commentDoc.exists() && commentDoc.data().userId !== currentUser.uid) {
+          const commentOwnerId = commentDoc.data().userId;
+          console.log("Comment owner ID:", commentOwnerId);
+  
+          const notificationsRef = collection(db, "users", commentOwnerId, "notifications");
+  
+          // Fetch original post details
+          const postRef = doc(db, "users", userId, "posts", postId);
+          const postDoc = await getDoc(postRef);
+  
+          if (postDoc.exists()) {
+            const posterId = postDoc.data().userId;
+            console.log("Original post data fetched. Poster ID:", posterId);
+  
+            await addDoc(notificationsRef, {
+              type: "reply",
+              fromUserId: currentUser.uid,
+              fromUserName: userData.firstName,
+              commentId: commentId,
+              commentContent: newComment,
+              postId: postId,
+              posterId: posterId,
+              timestamp: serverTimestamp(),
+              read: false,
+            });
+  
+            console.log("Notification sent successfully.");
+          } else {
+            console.error("Original post not found.");
+          }
+        } else {
+          console.log("No notification needed or comment owner is the current user.");
+        }
+  
         setNewComment("");
         fetchReplies();
       } else {
@@ -159,6 +203,8 @@ const ReplySection = ({
       console.error("Error adding reply:", error);
     }
   };
+  
+  
 
   return (
     <div className="mt-4">

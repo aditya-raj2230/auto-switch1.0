@@ -45,7 +45,9 @@ const CreatePostForm = ({ isExpanded, onClose, onExpand }) => {
       await addDoc(collection(userDocRef, "posts"), {
         content,
         imageUrl,
-        createdAt: new Date()
+        createdAt: new Date(),
+        likeCount: 0, // Initialize like count
+        likes: [], // Initialize likes array
       });
 
       setContent("");

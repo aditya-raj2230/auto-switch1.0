@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { db } from "@/app/firebase/config"; // Update with your Firebase configuration
-import { collection, getDocs, doc, updateDoc, arrayUnion, arrayRemove, onSnapshot, getDoc } from "firebase/firestore";
-import { useAuth } from '../app/context/AuthContext'; // Assuming you have an Auth context to get the current user
+import {
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  onSnapshot,
+  getDoc,
+  addDoc,
+} from "firebase/firestore";
+import { useAuth } from "../app/context/AuthContext"; // Assuming you have an Auth context to get the current user
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -9,7 +19,7 @@ const PublicPosts = () => {
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter()
+  const router = useRouter();
 
   const handleProfileClick = (userId) => {
     router.push(`/addFriends/${userId}`);
@@ -53,36 +63,44 @@ const PublicPosts = () => {
   useEffect(() => {
     fetchPosts();
 
-    const unsubscribeUsers = onSnapshot(collection(db, "users"), (userSnapshot) => {
-      userSnapshot.docChanges().forEach(async (userChange) => {
-        if (userChange.type === "added" || userChange.type === "modified") {
-          const userId = userChange.doc.id;
-          const userData = userChange.doc.data();
+    const unsubscribeUsers = onSnapshot(
+      collection(db, "users"),
+      (userSnapshot) => {
+        userSnapshot.docChanges().forEach(async (userChange) => {
+          if (userChange.type === "added" || userChange.type === "modified") {
+            const userId = userChange.doc.id;
+            const userData = userChange.doc.data();
 
-          const postsRef = collection(db, "users", userId, "posts");
-          const postsSnapshot = await getDocs(postsRef);
+            const postsRef = collection(db, "users", userId, "posts");
+            const postsSnapshot = await getDocs(postsRef);
 
-          const updatedPosts = postsSnapshot.docs.map((postDoc) => ({
-            id: postDoc.id,
-            ...postDoc.data(),
-            userId,
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            profileImageUrl: userData.profileImageUrl,
-          }));
+            const updatedPosts = postsSnapshot.docs.map((postDoc) => ({
+              id: postDoc.id,
+              ...postDoc.data(),
+              userId,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              profileImageUrl: userData.profileImageUrl,
+            }));
 
-          setPosts((prevPosts) => {
-            const newPosts = prevPosts.filter((post) => post.userId !== userId);
-            const mergedPosts = [...newPosts, ...updatedPosts];
-            mergedPosts.sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
-            return mergedPosts;
-          });
-        }
-      });
-    });
+            setPosts((prevPosts) => {
+              const newPosts = prevPosts.filter(
+                (post) => post.userId !== userId
+              );
+              const mergedPosts = [...newPosts, ...updatedPosts];
+              mergedPosts.sort(
+                (a, b) => b.createdAt.seconds - a.createdAt.seconds
+              );
+              return mergedPosts;
+            });
+          }
+        });
+      }
+    );
 
     return () => unsubscribeUsers();
   }, []);
+ 
 
   const handleLikeToggle = async (post) => {
     const postRef = doc(db, "users", post.userId, "posts", post.id);
@@ -91,6 +109,12 @@ const PublicPosts = () => {
     try {
       const postDoc = await getDoc(postRef);
       const postData = postDoc.data();
+
+      // Fetch current user's data
+      const userRef = doc(db, "users", userId);
+      const userDoc = await getDoc(userRef);
+      const userData = userDoc.data();
+      const fromUserName = userData.firstName; // Assuming firstName is the field for user's name
 
       if (postData.likes?.includes(userId)) {
         await updateDoc(postRef, {
@@ -102,12 +126,38 @@ const PublicPosts = () => {
           likes: arrayUnion(userId),
           likeCount: (postData.likeCount || 0) + 1,
         });
+
+        // Add notification
+        const notificationRef = collection(
+          db,
+          "users",
+          post.userId,
+          "notifications"
+        );
+        await addDoc(notificationRef, {
+          type: "like",
+          fromUserId: userId,
+          fromUserName: fromUserName,
+          postId: post.id,
+          posterId: post.userId,
+          postContent: post.content,
+          timestamp: new Date(),
+          read: false,
+        });
       }
 
       setPosts((prevPosts) =>
         prevPosts.map((p) =>
           p.id === post.id
-            ? { ...p, likes: postData.likes.includes(userId) ? postData.likes.filter((id) => id !== userId) : [...postData.likes, userId], likeCount: postData.likes.includes(userId) ? postData.likeCount - 1 : postData.likeCount + 1 }
+            ? {
+                ...p,
+                likes: postData.likes.includes(userId)
+                  ? postData.likes.filter((id) => id !== userId)
+                  : [...postData.likes, userId],
+                likeCount: postData.likes.includes(userId)
+                  ? postData.likeCount - 1
+                  : postData.likeCount + 1,
+              }
             : p
         )
       );
@@ -125,9 +175,11 @@ const PublicPosts = () => {
           <div
             key={post.id}
             className="w-full p-6 bg-white shadow-md rounded-lg mb-4"
-            
           >
-            <div className="flex items-center mb-4 cursor-pointer" onClick={() => handleProfileClick(post.userId)}>
+            <div
+              className="flex items-center mb-4 cursor-pointer"
+              onClick={() => handleProfileClick(post.userId)}
+            >
               <img
                 src={post.profileImageUrl}
                 alt="Profile"
@@ -138,13 +190,18 @@ const PublicPosts = () => {
                   {post.firstName} {post.lastName}
                 </p>
                 <p className="text-gray-500 text-sm">
-                  Date: {new Date(post.createdAt.seconds * 1000).toLocaleDateString()}
+                  Date:{" "}
+                  {new Date(post.createdAt.seconds * 1000).toLocaleDateString()}
                 </p>
               </div>
             </div>
             <p className="mb-4">{post.content}</p>
             {post.imageUrl && (
-              <img src={post.imageUrl} alt="Post" className="mt-4 rounded-lg max-h-64 w-full object-cover" />
+              <img
+                src={post.imageUrl}
+                alt="Post"
+                className="mt-4 rounded-lg max-h-64 w-full object-cover"
+              />
             )}
             <div className="flex justify-between items-center mt-4">
               <button
@@ -152,20 +209,36 @@ const PublicPosts = () => {
                 onClick={() => handleLikeToggle(post)}
               >
                 {post.likes?.includes(user.uid) ? (
-                  <img src="/icons8-heart-64.png" alt="Liked" className="h-8 w-8" />
+                  <img
+                    src="/icons8-heart-64.png"
+                    alt="Liked"
+                    className="h-8 w-8"
+                  />
                 ) : (
-                  <img src="/icons8-heart-50.png" alt="Like" className="h-8 w-8" />
+                  <img
+                    src="/icons8-heart-50.png"
+                    alt="Like"
+                    className="h-8 w-8"
+                  />
                 )}
                 <span className="ml-2">{post.likeCount || 0}</span>
               </button>
 
-              <button className="flex items-center text-gray-500 hover:text-blue-500" >
+              <button className="flex items-center text-gray-500 hover:text-blue-500">
                 <Link href={`/post/${post.userId}-${post.id}`} passHref>
-                <img src="/icons8-comment-50.png" alt="Comment" className="h-8 w-8" />
+                  <img
+                    src="/icons8-comment-50.png"
+                    alt="Comment"
+                    className="h-8 w-8"
+                  />
                 </Link>
               </button>
               <button className="flex items-center text-gray-500 hover:text-blue-500">
-                <img src="/icons8-share-50.png" alt="Share" className="h-8 w-8" />
+                <img
+                  src="/icons8-share-50.png"
+                  alt="Share"
+                  className="h-8 w-8"
+                />
               </button>
             </div>
           </div>

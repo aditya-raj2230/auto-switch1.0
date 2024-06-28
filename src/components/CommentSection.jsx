@@ -113,6 +113,22 @@ const CommentSection = ({ userId, postId, currentUser }) => {
           profilePic: userData.profileImageUrl,
           createdAt: serverTimestamp(),
         });
+
+        // Send notification to post owner
+        if (userId !== currentUser.uid) {
+          const notificationsRef = collection(db, "users", userId, "notifications");
+          await addDoc(notificationsRef, {
+            type: "comment",
+            fromUserId: currentUser.uid,
+            fromUserName: userData.firstName,
+            posterId:userId,
+            postId: postId,
+            postContent: newComment,
+            timestamp: serverTimestamp(),
+            read: false,
+          });
+        }
+
         setNewComment("");
         fetchComments();
       } else {
