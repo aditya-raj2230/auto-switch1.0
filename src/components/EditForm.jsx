@@ -367,7 +367,7 @@ const [updateVehicle,setUpdateVehicle]=useState(false)
         </button>
       </div>
       <div>{addvehicle && <EditForm2 userData={userData} userId={userId} />}</div>
-      <div>{updateVehicle && <Updateform userId={userId} vehicleId={updateVehicleId} onClose={() => setUpdateVehicleId(null)}/>}</div>
+      <div>{updateVehicle && <Updateform userId={userId} vehicleId={updateVehicleId} ></Updateform>}</div>
     </div>
   );
 };

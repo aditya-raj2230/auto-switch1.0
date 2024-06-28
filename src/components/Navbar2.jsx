@@ -114,6 +114,17 @@ const Navbar2 = () => {
               </Link>
             </li>
             <li>
+              <Link href="/requests">
+                <Image
+                  src="/handshake.png"
+                  alt="My Network"
+                  width={30}
+                  height={30}
+                  className="cursor-pointer"
+                />
+              </Link>
+            </li>
+            <li>
               <Link href="/addFriends">
                 <Image
                   src="/users-alt.png"
