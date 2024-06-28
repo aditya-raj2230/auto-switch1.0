@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { collection, doc, getDocs, getDoc } from "firebase/firestore";
 import { db } from "@/app/firebase/config";
+import { useRouter } from "next/navigation";
 
 const SelectedUserFollowingList = ({ selectedUserId }) => {
   const [followingUsers, setFollowingUsers] = useState([]);
@@ -32,8 +33,9 @@ const SelectedUserFollowingList = ({ selectedUserId }) => {
     fetchFollowingUsers();
   }, [selectedUserId]);
 
+  const router = useRouter()
   const handleProfileClick = (id) => {
-    // Implement profile click logic
+    router.push(`/addFriends/${id}`)
   };
 
   return (

@@ -13,7 +13,6 @@ const page = () => {
   return (
     <div>
       <UserProfile selectedUserId={userId} />
-      <UserList userId={userId}/>
     </div>
   )
 }

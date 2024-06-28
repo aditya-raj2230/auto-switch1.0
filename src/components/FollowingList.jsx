@@ -4,6 +4,8 @@ import { collection, doc, getDocs, getDoc, updateDoc, arrayUnion, arrayRemove, i
 import { db } from "@/app/firebase/config";
 import { useAuth } from "../app/context/AuthContext"; // Import the AuthContext
 import { useFollow } from "../app/context/FollowContext"; // Import the FollowContext
+import { Router } from "next/router";
+import { useRouter } from "next/navigation";
 
 const FollowingList = () => {
   const [followingUsers, setFollowingUsers] = useState([]);
@@ -75,8 +77,9 @@ const FollowingList = () => {
     }
   };
 
+  const router = useRouter()
   const handleProfileClick = (id) => {
-    // Implement profile click logic
+    router.push(`/addFriends/${id}`)
   };
 
   return (

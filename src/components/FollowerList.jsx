@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/app/firebase/config";
 import { useAuth } from "../app/context/AuthContext"; // Import the AuthContext
+import { useRouter } from "next/navigation";
 
 const FollowersList = () => {
   const [followers, setFollowers] = useState([]);
@@ -18,7 +19,7 @@ const FollowersList = () => {
         const usersSnapshot = await getDocs(usersCollection);
         const userList = usersSnapshot.docs
           .map(doc => ({ id: doc.id, ...doc.data() }))
-          .filter(u => u.following && u.following.includes(currentUserId));
+          .filter(u => u.following && u.followingf.includes(currentUserId));
         setFollowers(userList);
       } catch (error) {
         console.error("Error fetching followers:", error);
@@ -32,8 +33,9 @@ const FollowersList = () => {
     }
   }, [currentUserId]);
 
+  const router = useRouter()
   const handleProfileClick = (id) => {
-    // Implement profile click logic
+    router.push(`/addFriends/${id}`)
   };
 
   return (
