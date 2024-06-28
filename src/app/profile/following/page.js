@@ -1,10 +1,11 @@
-import FollowersList from '@/components/FollowerList'
+
+import FollowingList from '@/components/FollowingList'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      <FollowersList/>
+      <FollowingList/>
     </div>
   )
 }

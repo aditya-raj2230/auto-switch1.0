@@ -17,7 +17,9 @@ const SelectedUserFollowingList = ({ selectedUserId }) => {
           const followingIds = userSnapshot.data().following || [];
           const usersCollection = collection(db, "users");
           const usersSnapshot = await getDocs(usersCollection);
-          const userList = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(u => followingIds.includes(u.id));
+          const userList = usersSnapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .filter(user => followingIds.includes(user.id));
           setFollowingUsers(userList);
         }
       } catch (error) {

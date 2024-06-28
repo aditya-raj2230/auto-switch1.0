@@ -15,8 +15,10 @@ const FollowersList = () => {
       setLoading(true);
       try {
         const usersCollection = collection(db, "users");
-        const userSnapshot = await getDocs(usersCollection);
-        const userList = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(u => u.followers && u.followers.includes(currentUserId));
+        const usersSnapshot = await getDocs(usersCollection);
+        const userList = usersSnapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .filter(u => u.following && u.following.includes(currentUserId));
         setFollowers(userList);
       } catch (error) {
         console.error("Error fetching followers:", error);
@@ -25,7 +27,9 @@ const FollowersList = () => {
       }
     };
 
-    fetchFollowers();
+    if (currentUserId) {
+      fetchFollowers();
+    }
   }, [currentUserId]);
 
   const handleProfileClick = (id) => {

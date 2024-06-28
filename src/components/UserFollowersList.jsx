@@ -8,12 +8,25 @@ const SelectedUserFollowersList = ({ selectedUserId }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!selectedUserId) {
+      console.warn("SelectedUserId is not provided");
+      return;
+    }
+
     const fetchFollowers = async () => {
       setLoading(true);
+      console.log(`Fetching followers for user: ${selectedUserId}`);
       try {
         const usersCollection = collection(db, "users");
         const usersSnapshot = await getDocs(usersCollection);
-        const userList = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(u => u.followers && u.followers.includes(selectedUserId));
+        
+        const userList = usersSnapshot.docs.map(doc => {
+          const data = doc.data();
+          console.log(`User ${doc.id}:`, data);
+          return { id: doc.id, ...data };
+        }).filter(u => u.following && u.following.includes(selectedUserId));
+        
+        console.log(`Filtered followers:`, userList);
         setFollowers(userList);
       } catch (error) {
         console.error("Error fetching followers:", error);
@@ -27,6 +40,7 @@ const SelectedUserFollowersList = ({ selectedUserId }) => {
 
   const handleProfileClick = (id) => {
     // Implement profile click logic
+    console.log(`Profile clicked: ${id}`);
   };
 
   return (

@@ -2,22 +2,18 @@
 import SelectedUserFollowingList from '@/components/UserFollowingList'
 import React, { useEffect, useState } from 'react'
 
-const page = ({params}) => {
-
-    const [id, setId] = useState()
-  console.log(params)
- 
-  
+const Page = ({ params }) => {
+  const [id, setId] = useState(null);
 
   useEffect(() => {
-    setId(params.userId)
-  }, [params.userId])
-  console.log(id)
+    setId(params.userId);
+  }, [params.userId]);
+
   return (
     <div>
-      <SelectedUserFollowingList selectedUserId={id}/>
+      {id ? <SelectedUserFollowingList selectedUserId={id} /> : <div>Loading...</div>}
     </div>
   )
 }
 
-export default page
+export default Page

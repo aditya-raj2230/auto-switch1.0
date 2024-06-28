@@ -5,7 +5,6 @@ import { db } from "@/app/firebase/config";
 import { useAuth } from "../app/context/AuthContext"; // Import the AuthContext
 import { useFollow } from "../app/context/FollowContext"; // Import the FollowContext
 
-
 const FollowingList = () => {
   const [followingUsers, setFollowingUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +12,6 @@ const FollowingList = () => {
   const { user } = useAuth();
   const { followingList, setFollowingList } = useFollow();
   const currentUserId = user?.uid;
-  
 
   useEffect(() => {
     const fetchFollowingUsers = async () => {
@@ -24,9 +22,12 @@ const FollowingList = () => {
         if (userSnapshot.exists()) {
           const followingIds = userSnapshot.data().following || [];
           const usersCollection = collection(db, "users");
-          const userSnapshot = await getDocs(usersCollection);
-          const userList = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(u => followingIds.includes(u.id));
+          const usersSnapshot = await getDocs(usersCollection);
+          const userList = usersSnapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .filter(u => followingIds.includes(u.id));
           setFollowingUsers(userList);
+          setFollowingList(followingIds); // Ensure the followingList context is updated
         }
       } catch (error) {
         console.error("Error fetching following users:", error);
@@ -35,7 +36,9 @@ const FollowingList = () => {
       }
     };
 
-    fetchFollowingUsers();
+    if (currentUserId) {
+      fetchFollowingUsers();
+    }
   }, [currentUserId]);
 
   const handleFollow = async (targetUserId) => {
@@ -70,6 +73,10 @@ const FollowingList = () => {
     } finally {
       setFollowLoading(false);
     }
+  };
+
+  const handleProfileClick = (id) => {
+    // Implement profile click logic
   };
 
   return (
