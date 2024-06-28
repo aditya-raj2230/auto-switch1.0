@@ -1,6 +1,7 @@
 'use client'
 
 import AuthGuard2 from '@/components/LoggedOutAuthGaurad'
+import UserPosts from '@/components/UserPosts'
 // pages/profile/[userId].js
 import SelectedUserProfile from '@/components/selectedUserProfile'
 import React, { useEffect, useState } from 'react'
@@ -27,6 +28,9 @@ export default function Page ({params}){
     <div>
 
       <SelectedUserProfile selectedUserId={id} />
+      <div className="w-full flex justify-center">
+        <UserPosts userId={id}/>
+      </div>
     </div>
     </AuthGuard2>
   )
