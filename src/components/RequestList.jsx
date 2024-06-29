@@ -68,18 +68,18 @@ const RequestList = ({ userId }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-4 mb-20 bg-white rounded-lg shadow-lg p-6">
+    <div className="max-w-4xl mx-auto mt-10 bg-white rounded-lg shadow-lg p-6">
       <h2 className="text-2xl font-bold text-green-600 mb-6">My Requests</h2>
       {requests.length === 0 ? (
         <p className="text-gray-600">No requests found.</p>
       ) : (
         <div className="space-y-6">
           {requests.map(request => (
-            <div key={request.id} className="p-4 border rounded-md shadow-sm flex flex-col md:flex-row">
+            <div key={request.id} className="p-4 border rounded-md shadow-sm flex">
               <div className="flex-shrink-0">
-                <img src={request.vehicleDetails.imageUrl} alt="Vehicle" className="rounded-lg shadow-md w-full h-40 md:w-72 md:h-40 object-cover" />
+                <img src={request.vehicleDetails.imageUrl} alt="Vehicle" className="rounded-lg shadow-md w-72 h-40" />
               </div>
-              <div className="ml-0 md:ml-4 flex-grow mt-4 md:mt-0">
+              <div className="ml-4 flex-grow">
                 <h3 className="text-xl font-bold text-green-700 mb-2">
                   {request.vehicleDetails.manufacturer} {request.vehicleDetails.model}
                 </h3>
@@ -96,15 +96,15 @@ const RequestList = ({ userId }) => {
                   </Link>
                 </div>
               </div>
-              <div className="mt-4 md:mt-0 md:ml-4 flex-shrink-0 flex flex-col space-y-2">
-                <button className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600">
+              <div className="ml-4 flex-shrink-0">
+                <button className="block w-full bg-green-500 text-white py-2 px-4 rounded-md mb-2 hover:bg-green-600">
                   Accept
                 </button>
-                <button className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600">
+                <button className="block w-full bg-red-500 text-white py-2 px-4 rounded-md mb-2 hover:bg-red-600">
                   Reject
                 </button>
                 <button 
-                  className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                  className="block w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
                   onClick={() => handleSendMessage(request)}
                 >
                   Message
