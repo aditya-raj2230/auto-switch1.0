@@ -68,7 +68,7 @@ const RequestList = ({ userId }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 bg-white rounded-lg shadow-lg p-6">
+    <div className="max-w-4xl mx-auto mt-20 bg-white rounded-lg shadow-lg p-6">
       <h2 className="text-2xl font-bold text-green-600 mb-6">My Requests</h2>
       {requests.length === 0 ? (
         <p className="text-gray-600">No requests found.</p>
