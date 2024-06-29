@@ -68,7 +68,10 @@ const UserPosts = ({ userId }) => {
     console.log("Error loading profile image.");
     setProfileImageUrl('/default-profile.png');
   };
-
+  if (posts.length === 0) {
+    return <div className="w-2/3 p-4 bg-green-100 rounded-lg m-8 shadow-lg">No posts found.</div>;
+  }
+  
   return (
     <div className="w-full max-w-3xl flex flex-col items-center ">
       {loading ? (

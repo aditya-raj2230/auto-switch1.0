@@ -248,7 +248,7 @@ const ChatList = () => {
         </div>
       ) : (
         <div className="border-b border-gray-300 p-4">
-          <h1 className="text-3xl font-bold">Select a chat</h1>
+          <h1 className="text-3xl font-bold text-green-400">Select a chat</h1>
         </div>
       )}
     </div>

@@ -1,38 +1,27 @@
-'use client'
+'use client';
+import React from "react";
+import { useRouter } from "next/navigation";
+import SelectedUserProfile from "@/components/selectedUserProfile";
+import UserPosts from "@/components/UserPosts";
+import Reviews from "@/components/Reviews";
+import AuthGuard2 from "@/components/LoggedOutAuthGaurad";
 
-import AuthGuard2 from '@/components/LoggedOutAuthGaurad'
-import UserPosts from '@/components/UserPosts'
-// pages/profile/[userId].js
-import SelectedUserProfile from '@/components/selectedUserProfile'
-import React, { useEffect, useState } from 'react'
+const Page = ({ params }) => {
+  const { userId } = params;
 
-
-// to generate potential dynamic route
-
-
-export default function Page ({params}){
-  // const router = useRouter()
-  const [id, setId] = useState()
-  console.log(params)
- 
-  
-
-  useEffect(() => {
-    setId(params.userId)
-    
-  }, [params.userId])
-
-  
   return (
     <AuthGuard2>
-    <div>
-
-      <SelectedUserProfile selectedUserId={id} />
-      <div className="w-full flex justify-center">
-        <UserPosts userId={id}/>
+      <div className="flex flex-col md:flex-row max-w-7xl mx-auto my-10 p-4 bg-white rounded-lg shadow-lg">
+        <div className="w-full md:w-1/3 p-4 border-r border-gray-200">
+          <SelectedUserProfile selectedUserId={userId} />
+        </div>
+        <div className="w-full md:w-2/3 p-4">
+          <Reviews userId={userId} />
+          <UserPosts userId={userId} />
+        </div>
       </div>
-    </div>
     </AuthGuard2>
-  )
-}
+  );
+};
 
+export default Page;

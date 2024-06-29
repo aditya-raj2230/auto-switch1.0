@@ -185,14 +185,14 @@ const Navbar2 = () => {
           <>
             <li>
               <Link href="/auth/signup">
-                <button className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-drab-dark-brown hover:text-white hover:bg-drab-dark-brown">
+                <button className="bg-green-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-green-700 hover:text-white hover:bg-green-700">
                   Sign Up
                 </button>
-              </Link>
+              </Link>c
             </li>
             <li>
               <Link href="/auth/login">
-                <button className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-drab-dark-brown hover:text-white hover:bg-drab-dark-brown">
+                <button className="bg-green-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-green-700 hover:text-white hover:bg-green-700">
                   Login
                 </button>
               </Link>
