@@ -69,6 +69,7 @@ const Navbar2 = () => {
     try {
       await signOut(auth);
       router.push("/");
+      setIsProfileBoxVisible(false);
     } catch (error) {
       console.error("Error logging out:", error);
     }
