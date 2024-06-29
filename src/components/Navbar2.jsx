@@ -3,13 +3,12 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { signOut, onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "@/app/firebase/config"; // Ensure the db is imported
+import { auth, db } from "@/app/firebase/config";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/context/AuthContext"; // Import the AuthContext
+import { useAuth } from "@/app/context/AuthContext";
 
 const Navbar2 = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const router = useRouter();
@@ -64,10 +63,6 @@ const Navbar2 = () => {
     }
   }, [user]);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -78,103 +73,109 @@ const Navbar2 = () => {
   };
 
   return (
-    <nav className="flex flex-row top-0 z-30 justify-between px-10 py-2 w-screen sticky bg-green-50 border-2 border-gray-400">
+    <nav className="flex flex-row mt-4 md:mt-0 top-0 z-30 justify-between px-4 md:px-10 py-2 w-screen sticky bg-green-50 border-2 border-gray-400">
       <Link href="/">
         <Image
           src="/newLogo-removebg-preview.png"
           alt="logo"
           width={250}
           height={100}
-          className="m-0 p-0"
+          className="m-0 p-0 md:block hidden"
         />
       </Link>
-      <ul className="hidden h-full gap-12 lg:flex m-4">
+      <ul className="flex h-full gap-6 md:gap-4 lg:gap-12 m-2 md:m-4 md:justify-evenly mr-0  items-center text-xs md:text-base">
         {user && isVerified ? (
           <>
-            <li>
+            <li className="navbar-icon">
               <Link href="/">
                 <Image
                   src="/home.png"
                   alt="Home"
-                  width={30}
-                  height={30}
+                  width={40}
+                  height={40}
                   className="cursor-pointer"
                 />
               </Link>
             </li>
-            <li>
+            <li className="navbar-icon">
               <Link href="/marketPlace">
                 <Image
                   src="/car(1).png"
-                  alt="My Network"
-                  width={30}
-                  height={30}
+                  alt="Market Place"
+                  width={40}
+                  height={40}
                   className="cursor-pointer"
                 />
               </Link>
             </li>
-            <li>
+            <li className="navbar-icon">
               <Link href="/requests">
                 <Image
                   src="/handshake.png"
-                  alt="My Network"
-                  width={30}
-                  height={30}
+                  alt="Requests"
+                  width={40}
+                  height={40}
                   className="cursor-pointer"
                 />
               </Link>
             </li>
-            <li>
+            <li className="navbar-icon hidden md:block">
               <Link href="/addFriends">
                 <Image
                   src="/users-alt.png"
-                  alt="My Network"
-                  width={30}
-                  height={30}
+                  alt="Add Friends"
+                  width={40}
+                  height={40}
                   className="cursor-pointer"
                 />
               </Link>
             </li>
-            <li>
+            <li className="navbar-icon">
               <Link href="/chat">
                 <Image
                   src="/paper-plane.png"
-                  alt="Messaging"
-                  width={30}
-                  height={30}
+                  alt="Chat"
+                  width={40}
+                  height={40}
                   className="cursor-pointer"
                 />
               </Link>
             </li>
-            <li>
+            <li className="navbar-icon">
               <Link href="/notifications">
                 <Image
                   src={hasUnreadNotifications ? "/notification2.png" : "/bell.png"}
                   alt="Notifications"
-                  width={30}
-                  height={30}
+                  width={40}
+                  height={40}
                   className="cursor-pointer"
                 />
               </Link>
             </li>
-            <li className="relative group">
+            <li className="relative group navbar-icon">
               <Image
                 src="/user.png"
-                alt="Me"
-                width={30}
-                height={30}
+                alt="Profile"
+                width={40}
+                height={40}
                 className="cursor-pointer mb-2"
               />
-              <div className="absolute left-1/2 transform -translate-x-1/2 hidden group-hover:block bg-white shadow-lg rounded-lg w-32">
+              <div className="absolute left-1/2 transform -translate-x-1/2 md:top-[calc(100%+0.5rem)] md:-translate-y-0 top-[-200%] hidden group-hover:block bg-white shadow-lg border-2 rounded-lg w-40 z-10">
                 <Link
                   href="/profile"
-                  className="bg-green-500 text-white px-5 py-2 rounded-t-lg border-b-0 border-2 border-green-700 block whitespace-nowrap hover:bg-green-700"
+                  className="bg-green-500 text-white px-5 py-2 rounded-t-lg border-b-2 border-green-700 block whitespace-nowrap hover:bg-green-700"
                 >
                   View Profile
                 </Link>
+                <Link
+                  href="/addFriends"
+                  className="bg-green-500 text-white px-5 py-2 border-b-2 border-green-700 block whitespace-nowrap hover:bg-green-700 md:hidden"
+                >
+                  Add Friends
+                </Link>
                 <button
                   onClick={handleLogout}
-                  className="bg-green-500 text-white px-5 py-2 w-32 rounded-b-lg border-2 border-green-700 block whitespace-nowrap hover:bg-green-700"
+                  className="bg-green-500 text-white px-5 py-2 w-full rounded-b-lg border-b-2 border-green-700 block whitespace-nowrap hover:bg-green-700"
                 >
                   Logout
                 </button>
@@ -185,14 +186,14 @@ const Navbar2 = () => {
           <>
             <li>
               <Link href="/auth/signup">
-                <button className="bg-green-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-green-700 hover:text-white hover:bg-green-700">
+                <button className="bg-green-500 text-drab-dark-brown w-24 py-1 px-4 rounded-full border-2 border-green-700 hover:text-white hover:bg-green-700">
                   Sign Up
                 </button>
-              </Link>c
+              </Link>
             </li>
             <li>
               <Link href="/auth/login">
-                <button className="bg-green-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-green-700 hover:text-white hover:bg-green-700">
+                <button className="bg-green-500 text-drab-dark-brown px-4 py-1 rounded-full border-2 border-green-700 hover:text-white hover:bg-green-700">
                   Login
                 </button>
               </Link>
@@ -200,124 +201,6 @@ const Navbar2 = () => {
           </>
         )}
       </ul>
-      <div className="lg:hidden">
-        <Image
-          src="/menu.png"
-          alt="menu"
-          height={15}
-          width={25}
-          className="inline-block cursor-pointer"
-          onClick={toggleMenu}
-        />
-        <div
-          className={`fixed inset-y-0 right-0 bg-white z-40 flex flex-col items-center justify-center w-3/5 h-full transition-transform duration-300 ${
-            isMenuOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-        >
-          <button
-            className="absolute top-4 right-4 text-3xl"
-            onClick={toggleMenu}
-          >
-            &times;
-          </button>
-          <ul className="flex flex-col items-center gap-4 mt-8">
-            {user && isVerified ? (
-              <>
-                <li>
-                  <Link href="/">
-                    <Image
-                      src="/home.png"
-                      alt="Home"
-                      width={30}
-                      height={30}
-                      className="cursor-pointer"
-                    />
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/addFriends">
-                    <Image
-                      src="/users-alt.png"
-                      alt="My Network"
-                      width={30}
-                      height={30}
-                      className="cursor-pointer"
-                    />
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/chat">
-                    <Image
-                      src="/paper-plane.png"
-                      alt="Messaging"
-                      width={30}
-                      height={30}
-                      className="cursor-pointer"
-                    />
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/notifications">
-                    <Image
-                      src={hasUnreadNotifications ? "/notification2.png" : "/bell.png"}
-                      alt="Notifications"
-                      width={30}
-                      height={30}
-                      className="cursor-pointer"
-                    />
-                  </Link>
-                </li>
-                <li className="relative group">
-                  <Image
-                    src="/user.png"
-                    alt="Me"
-                    width={30}
-                    height={30}
-                    className="cursor-pointer"
-                  />
-                  <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-lg mt-2">
-                    <Link
-                      href="/profile"
-                      className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-t-lg border-b-2 border-drab-dark-brown w-full text-left hover:text-white hover:bg-drab-dark-brown"
-                    >
-                      View Profile
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-b-lg border-2 border-drab-dark-brown w-full text-left hover:text-white hover:bg-drab-dark-brown"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </li>
-              </>
-            ) : (
-              <>
-                <li>
-                  <Link href="/auth/signup">
-                    <button
-                      className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-drab-dark-brown hover:text-white hover:bg-drab-dark-brown"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Sign Up
-                    </button>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/auth/login">
-                    <button
-                      className="bg-cream-500 text-drab-dark-brown px-5 py-2 rounded-full border-2 border-drab-dark-brown hover:text-white hover:bg-drab-dark-brown"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Login
-                    </button>
-                  </Link>
-                </li>
-              </>
-            )}
-          </ul>
-        </div>
-      </div>
     </nav>
   );
 };

@@ -5,9 +5,9 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 const Hero = () => {
   return (
-    <section className="flex flex-row xl:flex-col gap-10 m-10">
-      <div className="hero-section w-screen text-center py-0 h-full lg:flex justify-around gap-0 flex-row hidden ">
-        <h1 className="text-4xl font-bold mb-4 flex flex-col justify-center  m-10  items-center lg:ml-96">
+    <section className="flex flex-row xl:flex-col gap-10 m-10 ">
+      <div className="hero-section w-screen text-center py-0 h-full  md:flex justify-around gap-0 flex-row hidden ">
+        <h1 className="text-4xl font-bold mb-4 text-green-500 flex flex-col justify-center  m-10  items-center md:ml-96">
           Join the<span> Motor Community</span>
         </h1>
         <Carousel
@@ -36,7 +36,7 @@ const Hero = () => {
           </div>
         </Carousel>
       </div>
-      <div className="hero-section w-screen text-center py-0 h-full lg:flex  justify-around gap-0 flex-row hidden ">
+      <div className="hero-section w-screen text-center py-0 h-full md:flex  justify-around gap-0 flex-row hidden ">
         <Carousel
           autoPlay
           infiniteLoop
@@ -63,12 +63,12 @@ const Hero = () => {
           </div>
           
         </Carousel>
-        <h1 className="text-4xl font-bold mb-4 flex flex-col justify-center  m-10  items-center lg:mr-96">
+        <h1 className="text-4xl text-green-400 font-bold mb-4 flex flex-col justify-center  m-10  items-center lg:mr-96">
           Beyond Cars <span>Building Connections</span>
         </h1>
       </div>
       <div className="hero-section w-screen text-center py-0 h-full lg:flex justify-around gap-0 flex-row hidden ">
-        <h1 className="text-4xl font-bold mb-4 flex flex-col justify-center  m-20  items-center lg:ml-96">
+        <h1 className="text-4xl font-bold mb-4 flex flex-col justify-center  m-20  items-center text-green-500 lg:ml-96">
           All wheels<span>One Community</span>
         </h1>
         <Carousel
@@ -109,7 +109,7 @@ const Hero = () => {
           showStatus={false}
           showArrows={false}
           showIndicators={false}
-          className="mx-auto h-2/5 bg-blue w-full rounded-lg lg:ml-32 lg:mr-10"
+          className="mx-auto h-2/5 bg-blue w-full rounded-lg md:ml-32 lg:mr-10"
         >
           <div className="relative rounded-lg">
             <img

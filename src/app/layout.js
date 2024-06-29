@@ -4,6 +4,8 @@ import Footer from "@/components/Footer";
 import Navbar2 from "@/components/Navbar2";
 import { AuthProvider } from "./context/AuthContext";
 import { FollowProvider } from "./context/FollowContext";
+import Link from "next/link";
+import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,9 +20,34 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <AuthProvider>
           <FollowProvider>
+            {/* Fixed Logo Image for Small Screens */}
+            <div className="fixed top-0 left-0 w-full bg-white z-20 p-2 md:hidden">
+              <Link href="/">
+                <Image
+                  src="/newLogo-removebg-preview.png"
+                  alt="logo"
+                  width={250}
+                  height={100}
+                  className="mx-auto"
+                />
+              </Link>
+            </div>
+            
             <div className="flex md:flex-col min-h-screen flex-col-reverse">
-              <Navbar2 className="md:order-first fixed top-0 left-0 right-0 z-50 bg-white shadow-md" />
-              <main className="relative overflow-hidden flex-1">{children}</main>
+              {/* Navbar for Medium Screens and Up */}
+              <div className="fixed top-0 left-0 w-full md:block hidden z-30 bg-white shadow-md">
+                <Navbar2 />
+              </div>
+              
+              {/* Main Content */}
+              <main className="relative overflow-hidden flex-1 pt-[104px] md:pt-[76px]">
+                {children}
+              </main>
+              
+              {/* Navbar for Mobile */}
+              <div className="block md:hidden fixed bottom-0 w-full z-50 bg-white shadow-md">
+                <Navbar2 />
+              </div>
             </div>
           </FollowProvider>
         </AuthProvider>

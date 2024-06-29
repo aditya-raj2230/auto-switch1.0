@@ -86,7 +86,7 @@ const CreatePostForm = ({ isExpanded, onClose, onExpand }) => {
 
   return (
     <div
-      className={`transition-all duration-300 ease-in-out ${
+      className={`transition-all duration-300 ease-in-out mt-4 ${
         isExpanded ? "fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50" : ""
       }`}
       onClick={handleClickInside}

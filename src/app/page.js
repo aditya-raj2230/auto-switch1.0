@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation';
 import { auth } from "@/app/firebase/config";
 import Feed from "@/components/Feed";
 import Hero from "@/components/Hero";
+import Navbar2 from "@/components/Navbar2";
+import Link from "next/link";
+import Image from "next/image";
+
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -27,8 +31,13 @@ export default function Home() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="bg-white">
-      {user && user.emailVerified ? <Feed /> : <Hero />}
+    <div className="flex flex-col min-h-screen">
+      
+      
+      <main className="flex-1 ">
+        {user && user.emailVerified ? <Feed /> : <Hero />}
+      </main>
+     
     </div>
   );
 }
