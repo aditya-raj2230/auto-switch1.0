@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import { db } from "@/app/firebase/config"; // Update with your Firebase configuration
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../app/context/AuthContext"; // Assuming you have an Auth context to get the current user
-import Link from "next/link";
 import CommentSection from "./CommentSection";
 
-const PostDetails = ({ postid ,currentUser}) => {
+const PostDetails = ({ postid, currentUser }) => {
   const [post, setPost] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [commentsVisible, setCommentsVisible] = useState(false);
 
   const fetchPostAndUser = async () => {
     try {
@@ -49,6 +48,10 @@ const PostDetails = ({ postid ,currentUser}) => {
     console.log("Like button clicked");
   };
 
+  const toggleComments = () => {
+    setCommentsVisible(!commentsVisible);
+  };
+
   return (
     <div className="flex flex-col items-center gap-4 p-4">
       {loading ? (
@@ -85,7 +88,7 @@ const PostDetails = ({ postid ,currentUser}) => {
           )}
           <div className="flex justify-between items-center mt-4">
             <button
-              className="flex items-center text-gray-500 hover:text-blue-500"
+              className="flex items-center text-green-600 hover:text-green-800"
               onClick={handleLikeToggle}
             >
               {post.likes?.includes(currentUser) ? (
@@ -104,20 +107,32 @@ const PostDetails = ({ postid ,currentUser}) => {
               <span className="ml-2">{post.likeCount || 0}</span>
             </button>
 
-            <button className="flex items-center text-gray-500 hover:text-blue-500">
-              <Link href={`/post/${postid}`} passHref>
-                <img
-                  src="/icons8-comment-50.png"
-                  alt="Comment"
-                  className="h-8 w-8"
-                />
-              </Link>
+            <button
+              className="flex items-center text-green-600 hover:text-green-800"
+              onClick={toggleComments}
+            >
+              <img
+                src="/icons8-comment-50.png"
+                alt="Comment"
+                className="h-8 w-8"
+              />
             </button>
-            <button className="flex items-center text-gray-500 hover:text-blue-500">
-              <img src="/icons8-share-50.png" alt="Share" className="h-8 w-8" />
+
+            <button className="flex items-center text-green-600 hover:text-green-800">
+              <img
+                src="/icons8-share-50.png"
+                alt="Share"
+                className="h-8 w-8"
+              />
             </button>
           </div>
-          <CommentSection userId={postid.split("-")[0]} postId={postid.split("-")[1]} currentUser={currentUser} />
+          {!commentsVisible && (
+            <CommentSection
+              userId={postid.split("-")[0]}
+              postId={postid.split("-")[1]}
+              currentUser={currentUser}
+            />
+          )}
         </div>
       ) : (
         <p>Post not found.</p>

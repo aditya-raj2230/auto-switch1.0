@@ -28,45 +28,6 @@ const CommentSection = ({ userId, postId, currentUser }) => {
     fetchComments();
   }, [postId]);
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
-    }
-  }, [newComment]);
-
-  const formatRelativeTime = (timestampInSeconds) => {
-    const currentTimestamp = Date.now() / 1000;
-    const seconds = Math.floor(currentTimestamp - timestampInSeconds);
-
-    let interval = Math.floor(seconds / 31536000);
-    if (interval >= 1) {
-      return `${interval} year${interval === 1 ? "" : "s"} ago`;
-    }
-
-    interval = Math.floor(seconds / 2592000);
-    if (interval >= 1) {
-      return `${interval} month${interval === 1 ? "" : "s"} ago`;
-    }
-
-    interval = Math.floor(seconds / 86400);
-    if (interval >= 1) {
-      return `${interval} day${interval === 1 ? "" : "s"} ago`;
-    }
-
-    interval = Math.floor(seconds / 3600);
-    if (interval >= 1) {
-      return `${interval} hour${interval === 1 ? "" : "s"} ago`;
-    }
-
-    interval = Math.floor(seconds / 60);
-    if (interval >= 1) {
-      return `${interval} minute${interval === 1 ? "" : "s"} ago`;
-    }
-
-    return `${Math.floor(seconds)} second${Math.floor(seconds) === 1 ? "" : "s"} ago`;
-  };
-
   const fetchComments = async (loadMore = false) => {
     try {
       setLoading(true);
@@ -121,7 +82,7 @@ const CommentSection = ({ userId, postId, currentUser }) => {
             type: "comment",
             fromUserId: currentUser.uid,
             fromUserName: userData.firstName,
-            posterId:userId,
+            posterId: userId,
             postId: postId,
             postContent: newComment,
             timestamp: serverTimestamp(),
@@ -139,13 +100,45 @@ const CommentSection = ({ userId, postId, currentUser }) => {
     }
   };
 
+  const formatRelativeTime = (timestampInSeconds) => {
+    const currentTimestamp = Date.now() / 1000;
+    const seconds = Math.floor(currentTimestamp - timestampInSeconds);
+
+    let interval = Math.floor(seconds / 31536000);
+    if (interval >= 1) {
+      return `${interval} year${interval === 1 ? "" : "s"} ago`;
+    }
+
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) {
+      return `${interval} month${interval === 1 ? "" : "s"} ago`;
+    }
+
+    interval = Math.floor(seconds / 86400);
+    if (interval >= 1) {
+      return `${interval} day${interval === 1 ? "" : "s"} ago`;
+    }
+
+    interval = Math.floor(seconds / 3600);
+    if (interval >= 1) {
+      return `${interval} hour${interval === 1 ? "" : "s"} ago`;
+    }
+
+    interval = Math.floor(seconds / 60);
+    if (interval >= 1) {
+      return `${interval} minute${interval === 1 ? "" : "s"} ago`;
+    }
+
+    return `${Math.floor(seconds)} second${Math.floor(seconds) === 1 ? "" : "s"} ago`;
+  };
+
   return (
     <div className="w-full mt-6">
-      <h3 className="text-xl font-bold mb-4">Comments</h3>
+      <h3 className="text-xl font-bold mb-4 text-green-600">Comments</h3>
       <div className="mt-4 flex items-start">
         <textarea
           ref={textareaRef}
-          className="w-full p-2 border border-gray-300 rounded-lg"
+          className="w-full p-2 border border-gray-300 rounded-lg focus:border-green-500 focus:outline-none transition-all"
           style={{
             minHeight: "3rem",
             lineHeight: "1.5",
@@ -156,8 +149,9 @@ const CommentSection = ({ userId, postId, currentUser }) => {
           rows={1}
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
+          onFocus={() => setActiveReply(null)}
         />
-        <button className="ml-2 px-4 py-2 mt-1 bg-blue-500 text-white rounded-lg" onClick={handleAddComment}>
+        <button className="ml-2 px-4 py-2 mt-1 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all" onClick={handleAddComment}>
           {">"}
         </button>
       </div>
@@ -180,14 +174,11 @@ const CommentSection = ({ userId, postId, currentUser }) => {
                 currentUser={currentUser}
                 activeReply={activeReply}
                 setActiveReply={setActiveReply}
-                newComment={newComment}
-                setNewComment={setNewComment}
-                handleAddComment={handleAddComment}
               />
             </div>
           ))}
           {hasMoreComments && (
-            <button className="text-blue-500" onClick={() => fetchComments(true)}>
+            <button className="text-green-500" onClick={() => fetchComments(true)}>
               Load More Comments
             </button>
           )}
