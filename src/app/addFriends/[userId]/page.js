@@ -1,10 +1,11 @@
 'use client';
 import React from "react";
 import { useRouter } from "next/navigation";
-import SelectedUserProfile from "@/components/SelectedUserProfile";
+
 import UserPosts from "@/components/UserPosts";
 import Reviews from "@/components/Reviews";
 import AuthGuard2 from "@/components/LoggedOutAuthGaurad";
+import SelectedUserProfile from "@/components/SelectedUserProfile";
 
 const Page = ({ params }) => {
   const { userId } = params;
