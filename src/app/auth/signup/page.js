@@ -33,7 +33,7 @@ export default function SignupPage() {
   }
 
   return (
-    <AuthGuard>
+   
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="container bg-white-100 shadow-md rounded-lg p-6">
         <Image
@@ -46,6 +46,6 @@ export default function SignupPage() {
         <SignupForm />
       </div>
     </div>
-    </AuthGuard>
+    
   );
 }
