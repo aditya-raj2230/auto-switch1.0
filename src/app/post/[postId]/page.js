@@ -18,7 +18,7 @@ const PostPage = ({params}) => {
     setPostid(params.postId)
   }, [params.postId])
 
-  return (<AuthGuard2><PostDetails postid={postid} currentUser={user}/></AuthGuard2>);
+  return (<AuthGuard2><div className='min-h-screen mb-20'><PostDetails postid={postid} currentUser={user}/></div></AuthGuard2>);
 };
 
 export default PostPage;

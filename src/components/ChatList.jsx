@@ -187,7 +187,7 @@ const ChatList = () => {
   };
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex min-h-screen w-full">
     <div className="w-1/3 border-r border-gray-300 flex flex-col relative">
       <div className="bg-white p-4">
         <h1 className="text-3xl font-bold text-green-400">Chats</h1>

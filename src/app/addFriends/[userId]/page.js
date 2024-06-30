@@ -12,7 +12,7 @@ const Page = ({ params }) => {
 
   return (
     <AuthGuard2>
-      <div className="flex flex-col md:flex-row max-w-7xl mx-auto my-10 p-4 bg-white rounded-lg shadow-lg">
+      <div className="flex flex-col md:flex-row max-w-7xl mx-auto my-10 p-4 min-h-screen mb-20 bg-white rounded-lg shadow-lg">
         <div className="w-full md:w-1/3 p-4 border-r border-gray-200">
           <SelectedUserProfile selectedUserId={userId} />
         </div>

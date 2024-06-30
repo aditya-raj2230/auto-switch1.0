@@ -81,7 +81,7 @@ const Marketplace = () => {
   }
 
   return (
-    <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
+    <div className="overflow-y-auto min-h-screen mt-10 mb-20" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
       <div className="p-4 mx-auto max-w-3xl">
         <div className="flex flex-col md:flex-row md:justify-between mb-4 items-center">
           <div className="relative w-full md:w-1/3 mb-4 md:mb-0">

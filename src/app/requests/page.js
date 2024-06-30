@@ -7,7 +7,7 @@ const page = () => {
     const {user} = useAuth()
     const userId= user.uid;
   return (
-    <div>
+    <div className='min-h-screen mb-20'>
       <RequestList userId={userId}/>
     </div>
   )

@@ -10,7 +10,7 @@ const ChatPage = () => {
 
   return (
     <AuthGuard2>
-    <div className="flex w-full h-screen mx-auto my-10 p-4 bg-white rounded-lg shadow-lg">
+    <div className="flex w-full min-h-screen mb-20 mx-auto my-10 p-4 bg-white rounded-lg shadow-lg">
       <ChatList />
       
     </div>

@@ -6,7 +6,7 @@ import React from 'react'
 const edit = () => {
   return (
     <AuthGuard2>
-    <div>
+    <div className='min-h-screen mb-20'>
       <EditForm/>
     </div>
     </AuthGuard2>

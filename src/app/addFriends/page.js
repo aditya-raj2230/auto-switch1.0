@@ -8,7 +8,7 @@ const AddFriends = () => {
    
   return (
     <AuthGuard2>
-    <div>
+    <div className="min-h-screen mb-20">
       <UserList  />
     </div>
     </AuthGuard2>

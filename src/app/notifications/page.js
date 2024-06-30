@@ -63,7 +63,7 @@ const Notification = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen mb-20 bg-gray-100">
       <div className="w-full max-w-3xl p-6 bg-white shadow-md rounded-lg">
         <h1 className="text-2xl font-bold text-green-700 mb-4">Notifications</h1>
         {loading ? (

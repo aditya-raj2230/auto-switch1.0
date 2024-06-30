@@ -31,13 +31,13 @@ export default function Home() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="flex flex-col min-h-screen">
+   
       
       
-      <main className="flex-1 ">
+      <main className="flex flex-col min-h-screen mb-20 ">
         {user && user.emailVerified ? <Feed /> : <Hero />}
       </main>
      
-    </div>
+   
   );
 }

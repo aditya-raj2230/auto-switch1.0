@@ -11,7 +11,7 @@ const Page = () => {
   const userId = user?.uid;
 
   return (
-    <div className="flex flex-col md:flex-row">
+    <div className="flex flex-col md:flex-row min-h-screen mb-20">
       <div className="w-full md:w-1/3 p-4">
         <UserProfile selectedUserId={userId} />
       </div>

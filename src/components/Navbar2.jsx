@@ -67,8 +67,9 @@ const Navbar2 = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
       router.push("/");
+      await signOut(auth);
+      
       setIsProfileBoxVisible(false);
     } catch (error) {
       console.error("Error logging out:", error);
@@ -99,7 +100,7 @@ const Navbar2 = () => {
 
   return (
     <>
-      <nav className="flex flex-row mt-4 md:mt-0 top-0 z-30 justify-between px-4 md:px-10 py-2 w-screen sticky bg-green-50 border-2 border-gray-400">
+      <nav className="flex flex-row md:mt-0 top-0 z-30 justify-between px-4 md:px-10 py-2 w-screen sticky bg-green-50 border-2 border-gray-400">
         <Link href="/">
           <Image
             src="/newLogo-removebg-preview.png"
@@ -215,12 +216,12 @@ const Navbar2 = () => {
             ref={profileBoxRef}
             className="bg-white shadow-lg border-2 rounded-lg w-80 z-50"
           >
-            <Link href="/profile">
+            <Link href="/profile" onClick={()=>{setIsProfileBoxVisible(false);}}>
               <div className="bg-green-500 text-white px-5 py-2 rounded-t-lg border-b-2 border-green-700 hover:bg-green-700 text-center cursor-pointer">
                 View Profile
               </div>
             </Link>
-            <Link href="/addFriends">
+            <Link href="/addFriends" onClick={()=>{setIsProfileBoxVisible(false);}}>
               <div className="bg-green-500 text-white px-5 py-2 border-b-2 border-green-700 hover:bg-green-700 text-center cursor-pointer">
                 Add Friends
               </div>

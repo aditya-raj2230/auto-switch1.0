@@ -61,7 +61,7 @@ const ChatRoom = ({ chatRoomId, selectedUser, onSendMessage, loggedInUser }) => 
   };
 
   return (
-    <div className="flex flex-col w-full h-full mb-20">
+    <div className="flex flex-col w-full h-full">
       <div className="bg-white p-4 border-b border-gray-300 flex items-center">
         <img src={selectedUser?.profileImageUrl || ''} alt={selectedUser?.firstName || 'Unknown'} className="w-10 h-10 rounded-full mr-4" />
         <h1 className="text-2xl font-bold">{selectedUser?.firstName || 'Unknown'} {selectedUser?.lastName || 'User'}</h1>

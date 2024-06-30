@@ -13,7 +13,7 @@ const page = ({params}) => {
   }, [params.userId])
   console.log(id)
   return (
-    <div>
+    <div className='min-h-screen mb-20'>
       <SelectedUserFollowersList selectedUserId={id}/>
     </div>
   )

@@ -10,7 +10,7 @@ const Page = ({ params }) => {
   }, [params.userId]);
 
   return (
-    <div>
+    <div className='min-h-screen mb-20'>
       {id ? <SelectedUserFollowingList selectedUserId={id} /> : <div>Loading...</div>}
     </div>
   )
