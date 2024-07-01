@@ -111,7 +111,13 @@ const Navbar2 = () => {
           />
         </Link>
         <ul className="flex h-full gap-6 md:gap-4 lg:gap-12 m-2 md:m-4 md:justify-evenly mr-0 items-center text-xs md:text-base">
-          {user && isVerified ? (
+          
+          { user && !isVerified?( <div
+              onClick={handleLogout}
+              className="bg-green-500 text-white px-5 py-2 w-full rounded-b-lg border-b-2 border-green-700 hover:bg-green-700 text-center cursor-pointer"
+            >
+              Go Back
+            </div>):user && isVerified ? (
             <>
               <li className="navbar-icon">
                 <Link href="/">
@@ -209,6 +215,13 @@ const Navbar2 = () => {
             </>
           )}
         </ul>
+{/* 
+        {user && !isVerified?( <div
+              onClick={handleLogout}
+              className="bg-green-500 text-white px-5 py-2 w-full rounded-b-lg border-b-2 border-green-700 hover:bg-green-700 text-center cursor-pointer"
+            >
+              Logout
+            </div>):(null)} */}
       </nav>
       {isProfileBoxVisible && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
