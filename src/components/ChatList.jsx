@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from "react";
 import { collection, query, getDocs, orderBy, onSnapshot, setDoc, doc, getDoc } from "firebase/firestore";
+
 import { db } from "@/app/firebase/config";
 import { useAuth } from "../app/context/AuthContext";
 import ChatRoom from "./ChatRoom";
@@ -122,7 +123,6 @@ const ChatList = () => {
 
     fetchSearchResults();
   }, [searchQuery]);
-  const handleSearch=()=>{}
 
   const handleUserClick = async (user) => {
     const chatRoomId = createChatRoomId(userId, user.id);
@@ -187,72 +187,71 @@ const ChatList = () => {
   };
 
   return (
-    <div className="flex min-h-screen w-full">
-    <div className="w-1/3 border-r border-gray-300 flex flex-col relative">
-      <div className="bg-white p-4">
-        <h1 className="text-3xl font-bold text-green-400">Chats</h1>
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search users..."
-          className="w-full mt-4 p-2 border border-gray-400 focus:border-green-300 rounded focus:outline-none"
-        />
-    
-      </div>
-      <div className="flex-1 overflow-y-auto">
-        {users.map((user) => (
-          <div
-            key={user.id}
-            onClick={() => handleUserClick(user)}
-            className="p-4 cursor-pointer hover:bg-green-100 hover:border-green-400 hover:border-2 hover:rounded-lg m-2 transition-colors duration-200"
-          >
-            <div className="flex items-center">
-              <img
-                src={user.profileImageUrl}
-                alt={user.firstName}
-                className="w-10 h-10 rounded-full mr-4"
-              />
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <p className="font-semibold text-black">{user.firstName} {user.lastName}</p>
-                  {user.unseenCount > 0 && (
-                    <span className="ml-2 text-xs text-red-500 font-semibold">
-                      {user.unseenCount}
-                    </span>
-                  )}
-                </div>
-                {user.lastMessage && (
-                  <div className="flex items-center mt-1">
-                    <p className="text-sm text-gray-600">{user.lastMessage.senderId === userId ? 'You' : user.firstName}: {user.lastMessage.text}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      {searchQuery && (
-        <SearchResult users={searchResults} onUserClick={handleUserClick} />
-      )}
-    </div>
-    <div className="w-2/3 bg-white flex flex-col">
-      {selectedChatRoomId ? (
-        <div className="h-full w-full">
-          <ChatRoom
-            chatRoomId={selectedChatRoomId}
-            selectedUser={selectedUser}
-            onSendMessage={handleSendMessage}
-            loggedInUser={loggedInUser}
+    <div className="flex flex-col md:flex-row min-h-screen w-full">
+      <div className="w-full md:w-1/3 border-r border-gray-300 flex flex-col relative">
+        <div className="bg-white p-4">
+          <h1 className="text-3xl font-bold text-green-400">Chats</h1>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search users..."
+            className="w-full mt-4 p-2 border border-gray-400 focus:border-green-300 rounded focus:outline-none"
           />
         </div>
-      ) : (
-        <div className="border-b border-gray-300 p-4">
-          <h1 className="text-3xl font-bold text-green-400">Select a chat</h1>
+        <div className={`flex-1 overflow-y-auto ${users.length > 4 ? 'max-h-[calc(100vh-12rem)]' : ''}`}>
+          {users.map((user, index) => (
+            <div
+              key={user.id}
+              onClick={() => handleUserClick(user)}
+              className="p-4 cursor-pointer hover:bg-green-100 hover:border-green-400 hover:border-2 hover:rounded-lg m-2 transition-colors duration-200"
+            >
+              <div className="flex items-center">
+                <img
+                  src={user.profileImageUrl}
+                  alt={user.firstName}
+                  className="w-10 h-10 rounded-full mr-4"
+                />
+                <div className="flex-1">
+                  <div className="flex justify-between items-center">
+                    <p className="font-semibold text-black">{user.firstName} {user.lastName}</p>
+                    {user.unseenCount > 0 && (
+                      <span className="ml-2 text-xs text-red-500 font-semibold">
+                        {user.unseenCount}
+                      </span>
+                    )}
+                  </div>
+                  {user.lastMessage && (
+                    <div className="flex items-center mt-1">
+                      <p className="text-sm text-gray-600">{user.lastMessage.senderId === userId ? 'You' : user.firstName}: {user.lastMessage.text}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-      )}
+        {searchQuery && (
+          <SearchResult users={searchResults} onUserClick={handleUserClick} />
+        )}
+      </div>
+      <div className="w-full md:w-2/3 bg-white flex flex-col">
+        {selectedChatRoomId ? (
+          <div className="h-full w-full">
+            <ChatRoom
+              chatRoomId={selectedChatRoomId}
+              selectedUser={selectedUser}
+              onSendMessage={handleSendMessage}
+              loggedInUser={loggedInUser}
+            />
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-500">
+            Select a chat to start messaging
+          </div>
+        )}
+      </div>
     </div>
-  </div>
   );
 };
 
