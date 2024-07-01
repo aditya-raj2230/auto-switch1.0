@@ -78,7 +78,7 @@ const ChatRoom = ({ chatRoomId, selectedUser, onSendMessage, loggedInUser }) => 
           placeholder="Type your message..."
           className="flex-1 p-2 border border-gray-400 rounded focus:outline-none focus:border-green-300"
         />
-        <button type="submit" className="ml-4 px-4 py-2 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition-colors duration-200">Send</button>
+        <button type="submit" className="ml-4 px-2 py-2 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition-colors duration-200">Send</button>
       </form>
     </div>
   );
