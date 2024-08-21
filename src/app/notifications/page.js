@@ -5,6 +5,9 @@ import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from "next/navigation";
 
+import UserProfile from "@/components/Profile";
+import RequestList from "@/components/RequestList";
+
 const Notification = () => {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
@@ -63,8 +66,12 @@ const Notification = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen mb-20 bg-gray-100">
-      <div className="w-full max-w-3xl p-6 bg-white shadow-md rounded-lg">
+    <div className="flex flex-col md:flex-row min-h-screen mb-20 mt-10">
+      {/* Profile section */}
+   
+
+      {/* Notifications section */}
+      <div className="md:w-1/3 p-6 bg-white shadow-md rounded-lg">
         <h1 className="text-2xl font-bold text-green-700 mb-4">Notifications</h1>
         {loading ? (
           <p>Loading notifications...</p>
@@ -76,7 +83,7 @@ const Notification = () => {
               onClick={() => handleNotificationClick(notification)}
             >
               <p className="text-green-800">
-                {notification.fromUserName} {notification.type === "comment" ? "commented on" : notification.type === "reply" ? "replied to" :  `${notification.fromUserName} liked`} your post: {notification.postContent || notification.commentContent}
+                {notification.fromUserName} {notification.type === "comment" ? "commented on" : notification.type === "reply" ? "replied to" : `${notification.fromUserName} liked`} your post: {notification.postContent || notification.commentContent}
               </p>
               <p className="text-green-600 text-sm">
                 {formatRelativeTime(notification.timestamp)}
@@ -84,6 +91,9 @@ const Notification = () => {
             </div>
           ))
         )}
+      </div>
+      <div className="md:w-2/3 p-6 bg-white shadow-md rounded-lg">
+      <RequestList userId={user.uid}/>
       </div>
     </div>
   );

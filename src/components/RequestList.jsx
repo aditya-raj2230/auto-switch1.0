@@ -68,45 +68,41 @@ const RequestList = ({ userId }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 mb-20 bg-white rounded-lg shadow-lg p-4 sm:p-6">
-      <h2 className="text-2xl font-bold text-green-600 mb-6 text-center sm:text-left">My Requests</h2>
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold text-green-600 mb-4">My Requests</h2>
       {requests.length === 0 ? (
-        <p className="text-gray-600 text-center sm:text-left">No requests found.</p>
+        <p className="text-gray-600 text-center">No requests found.</p>
       ) : (
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {requests.map(request => (
-            <div key={request.id} className="p-4 border rounded-md shadow-sm flex flex-col sm:flex-row">
-              <div className="flex-shrink-0 mb-4 sm:mb-0 sm:mr-4">
-                <img src={request.vehicleDetails.imageUrl} alt="Vehicle" className="rounded-lg shadow-md w-full sm:w-72 h-40 object-cover" />
+            <div key={request.id} className="p-2 border rounded-md shadow-sm flex flex-col">
+              <div className="flex-shrink-0 mb-2">
+                <img src={request.vehicleDetails.imageUrl} alt="Vehicle" className="rounded-lg shadow-md w-full h-32 object-cover" />
               </div>
               <div className="flex-grow">
-                <h3 className="text-xl font-bold text-green-700 mb-2">
+                <h3 className="text-lg font-bold text-green-700 mb-1">
                   {request.vehicleDetails.manufacturer} {request.vehicleDetails.model}
                 </h3>
-                <p className="text-gray-600 mb-1">Year: {request.vehicleDetails.year}</p>
-                <p className="text-gray-600 mb-1">Location: {request.vehicleDetails.city}, {request.vehicleDetails.state}</p>
-                <p className="text-gray-600 mb-1">Start Date: {request.startDate}</p>
-                <p className="text-gray-600 mb-1">End Date: {request.endDate}</p>
-                <p className="text-gray-600 mb-1">Bidding Price: ${request.biddingPrice}</p>
-                <div className="mt-4">
-                  <p className="text-gray-600">Request ID: {request.id}</p>
+                <p className="text-gray-600 text-sm mb-1">Year: {request.vehicleDetails.year}</p>
+                <p className="text-gray-600 text-sm mb-1">Location: {request.vehicleDetails.city}, {request.vehicleDetails.state}</p>
+                <p className="text-gray-600 text-sm mb-1">Start Date: {request.startDate}</p>
+                <p className="text-gray-600 text-sm mb-1">End Date: {request.endDate}</p>
+                <p className="text-gray-600 text-sm mb-1">Bidding Price: ${request.biddingPrice}</p>
+                <div className="mt-2">
+                  <p className="text-gray-600 text-sm">Request ID: {request.id}</p>
                   <Link href={`/addFriends/${request.senderId}`} passHref>
-                    <div className="text-gray-600 flex items-center cursor-pointer">
-                      Sender Name: {request.senderName}
-                      <img src={request.senderProfileImageUrl} alt="Sender" className="ml-2 rounded-full w-12 h-12" />
+                    <div className="text-gray-600 flex items-center cursor-pointer text-sm">
+                      Sender: {request.senderName}
                     </div>
                   </Link>
                 </div>
               </div>
-              <div className="mt-4 sm:mt-0 sm:ml-4 flex-shrink-0 flex flex-col space-y-2">
-                <button className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600">
-                  Accept
-                </button>
-                <button className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600">
+              <div className="mt-2 flex-shrink-0 flex flex-col space-y-2">
+                <button className="w-full bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600 text-sm">
                   Reject
                 </button>
                 <button 
-                  className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
+                  className="w-full bg-blue-500 text-white py-1 px-3 rounded-md hover:bg-blue-600 text-sm"
                   onClick={() => handleSendMessage(request)}
                 >
                   Message

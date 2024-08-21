@@ -50,7 +50,12 @@ const Navbar2 = () => {
 
   useEffect(() => {
     if (user) {
-      const notificationsRef = collection(db, "users", user.uid, "notifications");
+      const notificationsRef = collection(
+        db,
+        "users",
+        user.uid,
+        "notifications"
+      );
       const q = query(notificationsRef, where("read", "==", false));
 
       const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -69,7 +74,7 @@ const Navbar2 = () => {
     try {
       router.push("/");
       await signOut(auth);
-      
+
       setIsProfileBoxVisible(false);
     } catch (error) {
       console.error("Error logging out:", error);
@@ -81,7 +86,10 @@ const Navbar2 = () => {
   };
 
   const handleClickOutside = (event) => {
-    if (profileBoxRef.current && !profileBoxRef.current.contains(event.target)) {
+    if (
+      profileBoxRef.current &&
+      !profileBoxRef.current.contains(event.target)
+    ) {
       setIsProfileBoxVisible(false);
     }
   };
@@ -111,24 +119,24 @@ const Navbar2 = () => {
           />
         </Link>
         <ul className="flex h-full gap-6 md:gap-4 lg:gap-12 m-2 md:m-4 md:justify-evenly mr-0 items-center text-xs md:text-base">
-          
-          { user && !isVerified?( <div
+          {user && !isVerified ? (
+            <div
               onClick={handleLogout}
               className="bg-green-500 text-white px-5 py-2 w-full rounded-b-lg border-b-2 border-green-700 hover:bg-green-700 text-center cursor-pointer"
             >
               Go Back
-            </div>):user && isVerified ? (
+            </div>
+          ) : user && isVerified ? (
             <>
-              <li className="navbar-icon">
-                <Link href="/">
-                  <Image
-                    src="/home.png"
-                    alt="Home"
-                    width={40}
-                    height={40}
-                    className="cursor-pointer"
-                  />
-                </Link>
+              <li className="relative navbar-icon">
+                <Image
+                  src="/user.png"
+                  alt="Profile"
+                  width={40}
+                  height={40}
+                  className="cursor-pointer mb-2"
+                  onClick={handleProfileClick}
+                />
               </li>
               <li className="navbar-icon">
                 <Link href="/marketPlace">
@@ -177,23 +185,17 @@ const Navbar2 = () => {
               <li className="navbar-icon">
                 <Link href="/notifications">
                   <Image
-                    src={hasUnreadNotifications ? "/notification2.png" : "/bell.png"}
+                    src={
+                      hasUnreadNotifications
+                        ? "/notification2.png"
+                        : "/bell.png"
+                    }
                     alt="Notifications"
                     width={40}
                     height={40}
                     className="cursor-pointer"
                   />
                 </Link>
-              </li>
-              <li className="relative navbar-icon">
-                <Image
-                  src="/user.png"
-                  alt="Profile"
-                  width={40}
-                  height={40}
-                  className="cursor-pointer mb-2"
-                  onClick={handleProfileClick}
-                />
               </li>
             </>
           ) : (
@@ -215,7 +217,7 @@ const Navbar2 = () => {
             </>
           )}
         </ul>
-{/* 
+        {/* 
         {user && !isVerified?( <div
               onClick={handleLogout}
               className="bg-green-500 text-white px-5 py-2 w-full rounded-b-lg border-b-2 border-green-700 hover:bg-green-700 text-center cursor-pointer"
@@ -229,12 +231,22 @@ const Navbar2 = () => {
             ref={profileBoxRef}
             className="bg-white shadow-lg border-2 rounded-lg w-80 z-50"
           >
-            <Link href="/profile" onClick={()=>{setIsProfileBoxVisible(false);}}>
+            <Link
+              href="/"
+              onClick={() => {
+                setIsProfileBoxVisible(false);
+              }}
+            >
               <div className="bg-green-500 text-white px-5 py-2 rounded-t-lg border-b-2 border-green-700 hover:bg-green-700 text-center cursor-pointer">
                 View Profile
               </div>
             </Link>
-            <Link href="/addFriends" onClick={()=>{setIsProfileBoxVisible(false);}}>
+            <Link
+              href="/addFriends"
+              onClick={() => {
+                setIsProfileBoxVisible(false);
+              }}
+            >
               <div className="bg-green-500 text-white px-5 py-2 border-b-2 border-green-700 hover:bg-green-700 text-center cursor-pointer">
                 Add Friends
               </div>
