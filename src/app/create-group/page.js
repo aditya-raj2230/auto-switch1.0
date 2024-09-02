@@ -8,7 +8,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import UserList from "@/components/UserList";
 
-
 const CreateGroup = () => {
   const router = useRouter();
   const [userId, setUserId] = useState(null);
@@ -18,7 +17,7 @@ const CreateGroup = () => {
   const [groupImageUrl, setGroupImageUrl] = useState("");
   const [friendEmails, setFriendEmails] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
+  
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -41,8 +40,8 @@ const CreateGroup = () => {
     setGroupImageUrl(imageUrl);
   };
 
-  const handleAddFriend = (email) => {
-    setFriendEmails((prevEmails) => [...prevEmails, email]);
+  const handleAddFriend = (user) => {
+    setFriendEmails((prevEmails) => [...prevEmails, user.email]);
   };
 
   const handleCreateGroup = async () => {
@@ -109,14 +108,8 @@ const CreateGroup = () => {
           <img src={groupImageUrl} alt="Group" className="w-full h-64 object-cover rounded-md" />
         </div>
       )}
-      <div className="mb-4">
-        <button
-          onClick={() => setShowModal(true)} // Open the modal
-          className={`w-full bg-blue-500 text-white px-4 py-2 rounded ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"}`}
-        >
-          Add Members
-        </button>
-      </div>
+      {/*
+        */}
       <button
         onClick={handleCreateGroup}
         className={`w-full bg-blue-500 text-white px-4 py-2 rounded ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"}`}
@@ -125,22 +118,10 @@ const CreateGroup = () => {
         {loading ? "Creating..." : "Create Group"}
       </button>
 
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-            <h2 className="text-2xl font-bold mb-4">Select Friends</h2>
-            <UserList handleAddFriend={handleAddFriend} />
-            <button
-              onClick={() => setShowModal(false)} // Close the modal
-              className="mt-4 w-full bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+     
     </div>
   );
 };
 
 export default CreateGroup;
+

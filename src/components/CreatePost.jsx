@@ -1,151 +1,122 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
-import { storage, db } from "@/app/firebase/config"; // Import your Firebase configuration
+import React, { useState } from "react";
+import { storage, db } from "@/app/firebase/config";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc, doc } from "firebase/firestore";
-import { useAuth } from "../app/context/AuthContext"; // Assuming you have an Auth context to get the current user
-import { useRouter } from "next/navigation";
+import { useAuth } from "../app/context/AuthContext";
 
 const CreatePostForm = ({ isExpanded, onClose, onExpand }) => {
-  const { user } = useAuth(); // Get the current logged-in user
-  const [content, setContent] = useState('');
+  const { user } = useAuth();
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [description, setDescription] = useState('');
+  const [bidAmount, setBidAmount] = useState('');
+  const [rentOrPool, setRentOrPool] = useState('rent');
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const formRef = useRef();
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setImageFile(file);
-
-    // Display image preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!content) return;
-
+    e.preventDefault(); // Prevent page refresh
     setLoading(true);
     try {
       let imageUrl = "";
       if (imageFile) {
-        const imageRef = ref(storage, `posts/${user.uid}/${imageFile.name}`);
+        const imageRef = ref(storage, `requests/${user.uid}/${imageFile.name}`);
         const snapshot = await uploadBytes(imageRef, imageFile);
         imageUrl = await getDownloadURL(snapshot.ref);
       }
 
       const userDocRef = doc(db, "users", user.uid);
 
-      await addDoc(collection(userDocRef, "posts"), {
-        content,
+      await addDoc(collection(userDocRef, "requests"), {
+        startDate,
+        endDate,
+        description,
+        bidAmount,
+        rentOrPool,
         imageUrl,
         createdAt: new Date(),
-        likeCount: 0, // Initialize like count
-        likes: [], // Initialize likes array
+        userId: user.uid,
+        userName: user.displayName,
+        userPhoto: user.photoURL,
       });
 
-      setContent("");
+      // Clear form fields
+      setStartDate("");
+      setEndDate("");
+      setDescription("");
+      setBidAmount("");
       setImageFile(null);
-      setImagePreview('');
-      router.push('/'); // Uncomment if you have a router setup
+
+      // Close the modal
+      onClose();
     } catch (error) {
-      console.error("Error creating post:", error);
+      console.error("Error creating request:", error);
     }
     setLoading(false);
   };
 
-  const handleClickInside = (event) => {
-    event.stopPropagation();
-    if (!isExpanded) {
-      onExpand();
-    }
-  };
-
-  const handleClickOutside = (event) => {
-    if (formRef.current && !formRef.current.contains(event.target)) {
-      onClose();
-    }
-  };
-
-  useEffect(() => {
-    if (isExpanded) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isExpanded]);
-
   return (
-    <div
-      className={`transition-all duration-300 ease-in-out mt-4 ${
-        isExpanded ? "fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50" : ""
-      }`}
-      onClick={handleClickInside}
-    >
-      <div
-        ref={formRef}
-        className={`p-4 bg-white shadow-md rounded-lg w-full ${
-          isExpanded ? "max-w-3xl mx-auto mt-8" : ""
-        }`}
-      >
-        <h2 className="text-2xl font-bold mb-4 text-green-600">Create Post</h2>
-        <form onSubmit={handleSubmit}>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="What's on your mind?"
-            className={`w-full p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              isExpanded ? "h-40" : "h-20"
-            }`}
-          />
-          {imagePreview && (
-            <div className="mb-4">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="max-w-full h-auto rounded-lg"
+    <div>
+      <button onClick={onExpand} className="bg-green-500 text-white py-2 px-4 rounded">
+        Create Request
+      </button>
+      {isExpanded && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">Create Request</h2>
+            <form onSubmit={handleSubmit}>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                placeholder="Start Date"
+                className="w-full mb-4 p-2 border rounded"
               />
-            </div>
-          )}
-          <div className="flex flex-row justify-between">
-            <div className="flex items-center mb-4">
-              {/* Hidden input to trigger file selection */}
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                placeholder="End Date"
+                className="w-full mb-4 p-2 border rounded"
+              />
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Description"
+                className="w-full mb-4 p-2 border rounded"
+              />
+              <input
+                type="number"
+                value={bidAmount}
+                onChange={(e) => setBidAmount(e.target.value)}
+                placeholder="Bid Amount per Day"
+                className="w-full mb-4 p-2 border rounded"
+              />
+              <select
+                value={rentOrPool}
+                onChange={(e) => setRentOrPool(e.target.value)}
+                className="w-full mb-4 p-2 border rounded"
+              >
+                <option value="rent">Rent</option>
+                <option value="pool">Pool</option>
+              </select>
               <input
                 type="file"
-                onChange={handleFileChange}
-                className="hidden"
-                id="file-upload"
+                onChange={(e) => setImageFile(e.target.files[0])}
+                className="w-full mb-4 p-2 border rounded"
               />
-
-              {/* Custom button for file upload */}
-              <label
-                htmlFor="file-upload"
-                className="cursor-pointer"
-              >
-                <img src="/photo.png" alt="upload image" height={32} width={32} />
-              </label>
-            </div>
-            <div>
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-green-500 mt-2 text-white py-2 px-6 rounded-full font-bold hover:bg-green-600 disabled:bg-green-300"
+                className="bg-green-500 text-white py-2 px-4 rounded"
               >
-                {loading ? 'Posting...' : 'Post'}
+                {loading ? 'Posting...' : 'Submit'}
               </button>
-            </div>
+            </form>
           </div>
-        </form>
-      </div>
+        </div>
+      )}
     </div>
   );
 };
