@@ -108,14 +108,14 @@ const Navbar2 = () => {
 
   return (
     <>
-      <nav className="flex flex-row md:mt-0 top-0 z-30 justify-between px-4 md:px-10 py-2 w-screen sticky bg-green-50 border-2 border-gray-400">
+      <nav className="flex flex-row md:mt-0 top-0 z-30 justify-between px-4 md:px-10 bg-white py-2 w-screen sticky ">
         <Link href="/">
           <Image
             src="/newLogo-removebg-preview.png"
             alt="logo"
             width={250}
             height={100}
-            className="m-0 p-0 md:block hidden"
+            className="m-0 p-0 md:block hidden bg-white"
           />
         </Link>
         <ul className="flex h-full gap-6 md:gap-4 lg:gap-12 m-2 md:m-4 md:justify-evenly mr-0 items-center text-xs md:text-base">
@@ -134,7 +134,7 @@ const Navbar2 = () => {
                   alt="Profile"
                   width={40}
                   height={40}
-                  className="cursor-pointer mb-2"
+                  className="cursor-pointer mb-2 bg-white"
                   onClick={handleProfileClick}
                 />
               </li>
@@ -200,20 +200,20 @@ const Navbar2 = () => {
             </>
           ) : (
             <>
-              <li>
+              {/* <li>
                 <Link href="/auth/signup">
                   <button className="bg-green-500 text-drab-dark-brown w-24 py-1 px-4 rounded-full border-2 border-green-700 hover:text-white hover:bg-green-700">
-                    Sign Up
+                    
                   </button>
                 </Link>
               </li>
               <li>
                 <Link href="/auth/login">
                   <button className="bg-green-500 text-drab-dark-brown px-4 py-1 rounded-full border-2 border-green-700 hover:text-white hover:bg-green-700">
-                    Login
+                    
                   </button>
                 </Link>
-              </li>
+              </li> */}
             </>
           )}
         </ul>

@@ -1,149 +1,120 @@
-
 "use client";
 
-import { Carousel } from "react-responsive-carousel";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Carousel from "./Corousal";
+
 const Hero = () => {
+  const [universities, setUniversities] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredUniversities, setFilteredUniversities] = useState([]);
+
+  // Fetching universities using a free API
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      const response = await fetch(
+        "http://universities.hipolabs.com/search?country=United%20States"
+      );
+      const data = await response.json();
+      setUniversities(data);
+    };
+    fetchUniversities();
+  }, []);
+
+  // Filtering universities based on search term
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = universities.filter((uni) =>
+        uni.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredUniversities(filtered);
+    } else {
+      setFilteredUniversities([]); // Clear the list when searchTerm is empty
+    }
+  }, [searchTerm, universities]);
+
   return (
-    <section className="flex flex-row xl:flex-col gap-10 m-10 ">
-      <div className="hero-section w-screen text-center py-0 h-full  md:flex justify-around gap-0 flex-row hidden ">
-        <h1 className="text-4xl font-bold mb-4 text-green-500 flex flex-col justify-center  m-10  items-center md:ml-96">
-          Join the<span> Motor Community</span>
-        </h1>
-        <Carousel
-          autoPlaych
-          infiniteLoop
-          showThumbs={false}
-          showStatus={false}
-          showArrows={false}
-          showIndicators={false}
-          className="mx-auto h-2/5 bg-blue w-3/4 rounded-lg ml-32 mr-10"
-        >
-          <div className="rounded-lg">
-            <img
-              src="/logan-simpson-n1nUle51VeI-unsplash.jpg"
-              alt="Dream Car 1"
-              className="object-cover w-140 h-96 rounded-lg"
-            />
-          </div>
-          
-          <div className="rounded-lg">
-            <img
-              src="/julian-hochgesang-G7sWGEF8pRc-unsplash.jpg"
-              alt="Dream Car 3"
-              className="object-cover w-140 h-96 rounded-lg"
-            />
-          </div>
-        </Carousel>
-      </div>
-      <div className="hero-section w-screen text-center py-0 h-full md:flex  justify-around gap-0 flex-row hidden ">
-        <Carousel
-          autoPlay
-          infiniteLoop
-          showThumbs={false}
-          showStatus={false}
-          showArrows={false}
-          showIndicators={false}
-          className="mx-auto h-2/5 bg-blue w-3/4 rounded-lg mr-32 ml-10 "
-        >
-          <div className="rounded-lg">
-            <img
-              src="/harley-davidson-1HZcJjdtc9g-unsplash.jpg"
-              alt="Dream Car 1"
-              className="object-cover w-full h-96 rounded-lg"
-
-            />
-          </div>
-          <div className="rounded-lg">
-            <img
-              src="/jon-flobrant-lRSChvh1Mhs-unsplash.jpg"
-              alt="Dream Car 2"
-              className="object-cover w-full h-96 rounded-lg"
-            />
-          </div>
-          
-        </Carousel>
-        <h1 className="text-4xl text-green-400 font-bold mb-4 flex flex-col justify-center  m-10  items-center lg:mr-96">
-          Beyond Cars <span>Building Connections</span>
-        </h1>
-      </div>
-      <div className="hero-section w-screen text-center py-0 h-full lg:flex justify-around gap-0 flex-row hidden ">
-        <h1 className="text-4xl font-bold mb-4 flex flex-col justify-center  m-20  items-center text-green-500 lg:ml-96">
-          All wheels<span>One Community</span>
-        </h1>
-        <Carousel
-          autoPlay
-          infiniteLoop
-          showThumbs={false}
-          showStatus={false}
-          showArrows={false}
-          showIndicators={false}
-          className="mx-auto h-2/5 bg-blue w-3/4 rounded-lg ml-32 mr-10"
-        >
-          <div className="rounded-lg">
-            <img
-              src="/joshua-koblin-kvbblovYuX4-unsplash.jpg"
-              alt="Dream Car 1"
-              className="object-cover w-full h-96 rounded-lg"
-
-            />
-          </div>
-          <div className="rounded-lg">
-            <img
-              src="/chris-kursikowski-wRpxzcowfKk-unsplash.jpg"
-              alt="Dream Car 2"
-              className="object-cover w-full h-96 rounded-lg"
-            />
-          </div>
-        
-        </Carousel>
-      </div>
+    <div className="flex flex-col">
+    <section
+      className="relative flex flex-col xl:flex-row justify-between items-center gap-5 m-0 h-[90vh] px-6 lg:px-12 py-8 bg-gray-50"
+      style={{ zIndex: 10, paddingTop: "50px" }} // Reduced padding to bring text closer to navbar
+    >
+      {/* Left side column: Caption and Form */}
       
+      <div className="relative z-30 xl:w-1/3 flex flex-col items-center xl:items-start mt-0 xl:mt-8">
+        <h1 className="text-5xl font-extrabold text-gray-800 mb-2 text-center xl:text-left leading-tight">
+         Join Your Campus Car Community
+        </h1>
+        <p className="text-lg font-light text-gray-600 mb-4 text-center xl:text-left max-w-md">
+          Buy, sell, or rent vehicles within your campus.
+        </p>
 
+        {/* Input box and button directly under the text */}
+        <div className="relative flex flex-col xl:flex-row items-center xl:items-start gap-8 mb-12">
+          <input
+            type="text"
+            placeholder="Search your university"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 text-black border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ height: "40px" }}
+          />
 
-      <div className="hero-section w-screen text-center py-0 h-full flex flex-col lg:flex-row justify-around gap-0 lg:hidden lg:gap-0 rounded-lg mt-10">
-        <Carousel
-          autoPlay
-          infiniteLoop
-          showThumbs={false}
-          showStatus={false}
-          showArrows={false}
-          showIndicators={false}
-          className="mx-auto h-2/5 bg-blue w-full rounded-lg md:ml-32 lg:mr-10"
-        >
-          <div className="relative rounded-lg">
-            <img
-              src="/samuel-girven-NGbtPRrEujY-unsplash.jpg"
-              alt="Dream Car 1"
-              className="object-cover w-full h-96 rounded-lg"
-            />
-            <h2 className="absolute inset-0 flex items-center justify-center text-2xl rounded-lg font-bold text-white bg-black bg-opacity-50 lg:text-4xl lg:top-10 lg:left-10">
-              Join the Ultimate Community today
-            </h2>
+          <button
+            className="bg-black text-white w-full xl:w-auto py-2 px-6 rounded-lg hover:bg-gray-800 transition duration-300 flex items-center justify-center"
+            onClick={() =>
+              alert("Search community functionality to be implemented")
+            }
+          >
+            Search
+          </button>
+        </div>
+
+        {/* Dropdown suggestions */}
+        {filteredUniversities.length > 0 && (
+          <div className="absolute z-40 w-full bg-white shadow-lg rounded-lg border border-gray-300 max-h-40 overflow-y-auto mt-1">
+            {filteredUniversities.map((uni, index) => (
+              <div
+                key={index}
+                className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                onClick={() => setSearchTerm(uni.name)}
+              >
+                {uni.name}
+              </div>
+            ))}
           </div>
-          <div className="relative rounded-lg">
-            <img
-              src="/logan-simpson-n1nUle51VeI-unsplash.jpg"
-              alt="Dream Car 2"
-              className="object-cover w-full h-96 rounded-lg"
-            />
-            <h2 className="absolute inset-0 flex items-center justify-center text-2xl rounded-lg font-bold text-white bg-black bg-opacity-50 lg:text-4xl lg:top-10 lg:left-10">
-              Beyond Cars Building Connections
-            </h2>
-          </div>
-          <div className="relative rounded-lg">
-            <img
-              src="/stephan-louis-QjrILOZV8-U-unsplash.jpg"
-              alt="Dream Car 3"
-              className="object-cover w-full h-96 rounded-lg"
-            />
-            <h2 className="absolute inset-0 flex items-center justify-center text-2xl font-bold rounded-lg text-white bg-black bg-opacity-50 lg:text-4xl lg:top-10 lg:left-10">
-              All Wheels One Community
-            </h2>
-          </div>
-        </Carousel>
+        )}
       </div>
+
+      {/* Right side: Larger Image */}
+      <div className="relative w-full xl:w-2/3 h-auto  xl:mt-[-4rem] ">
+        <Image
+          src="/final(1).jpg"
+          alt="logo"
+          layout="responsive"
+          width={1000}
+          height={600}
+          className="rounded-lg shadow-lg object-cover mt-20"
+        />
+      </div>
+
+      {/* Translucent floating boxes for decorative purposes */}
+      <div className="absolute top-8 left-8 bg-blue-500 opacity-30 w-36 h-36 rounded-full blur-2xl animate-[moveAcrossScreen_10s_linear_infinite]"></div>
+      <div className="absolute bottom-8 right-16 bg-yellow-500 opacity-30 w-40 h-24 rounded-full blur-2xl animate-[moveAcrossScreen_12s_linear_infinite]"></div>
+     
+      <div className="absolute bottom-1/2 right-1/2 bg-red-500 opacity-30 w-36 h-32 rounded-full blur-2xl animate-[moveAcrossScreen_15s_linear_infinite]"></div>
     </section>
+    
+    {/* <section className="flex flex-row"> */}
+      {/* <div className="w-96 h-96"> */}
+    <Carousel/>
+    {/* </div> */}
+    {/* <div className="w-36 h-24 bg-yellow-100"> */}
+
+    {/* </div> */}
+    {/* </section> */}
+    
+    </div>
   );
 };
 

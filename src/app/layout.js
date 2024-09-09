@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <FollowProvider>
             {/* Fixed Logo Image for Small Screens */}
-            <div className="fixed top-0 left-0 w-full bg-white z-20 p-2 md:hidden">
+            <div className="fixed top-0 left-0 w-full bg-white p-2 md:hidden">
               <Link href="/">
                 <Image
                   src="/newLogo-removebg-preview.png"
@@ -35,7 +35,7 @@ export default function RootLayout({ children }) {
             
             <div className="flex md:flex-col min-h-screen flex-col-reverse">
               {/* Navbar for Medium Screens and Up */}
-              <div className="fixed top-0 left-0 w-full md:block hidden z-30 bg-white shadow-md">
+              <div className="fixed top-0 left-0 w-full md:block hidden z-30 bg-white ">
                 <Navbar2 />
               </div>
               
@@ -45,7 +45,7 @@ export default function RootLayout({ children }) {
               </main>
               
               {/* Navbar for Mobile */}
-              <div className="block md:hidden fixed bottom-0 w-full z-50 bg-white shadow-md">
+              <div className="block md:hidden fixed bottom-0 w-full z-50 bg-white">
                 <Navbar2 />
               </div>
             </div>

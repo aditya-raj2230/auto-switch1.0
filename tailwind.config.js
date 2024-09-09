@@ -57,6 +57,9 @@ module.exports = {
             800: '#f8d39e',
             900: '#fce9ce',
           },
+          darkbeige:{
+            DEFAULT:'#efe8de'
+          },
           drab_dark_brown: {
             DEFAULT: '#37371f',
             100: '#0b0b06',

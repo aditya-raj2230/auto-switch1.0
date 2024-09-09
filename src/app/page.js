@@ -49,7 +49,7 @@ const Page = () => {
   return (
     <div className="flex flex-col md:flex-row min-h-screen mb-20">
       {!userId ? (
-        <div className="w-full">
+        <div className="w-full bg-white">
           <Hero />
         </div>
       ) : (

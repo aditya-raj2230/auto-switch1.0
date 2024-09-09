@@ -9,3 +9,40 @@ body {
   .container {
     @apply max-w-md mx-auto p-4;
   }
+
+  @keyframes move {
+    0% {
+      transform: translate(0, 0);
+    }
+    25% {
+      transform: translate(50px, -30px);
+    }
+    50% {
+      transform: translate(-30px, 50px);
+    }
+    75% {
+      transform: translate(30px, 30px);
+    }
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+  @keyframes moveAcrossScreen {
+    0% {
+      transform: translate(0, 0);
+    }
+    25% {
+      transform: translate(80vw, 10vh);
+    }
+    50% {
+      transform: translate(-50vw, 70vh);
+    }
+    75% {
+      transform: translate(30vw, -50vh);
+    }
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+  
+  
