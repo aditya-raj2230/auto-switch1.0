@@ -53,7 +53,7 @@ const ChatRoom = ({ chatRoomId, selectedUser, onSendMessage, loggedInUser }) => 
   };
 
   return (
-    <div className="flex flex-col h-full max-h-[calc(100vh-4rem)] md:max-h-[calc(100vh-4rem)] border-2 rounded-lg border-green-300">
+    <div className="flex flex-col max-h-[90vh] border-2 rounded-lg w-full">
       <div className="p-4 border-b border-gray-300 flex items-center bg-white sticky top-0 z-10">
         <img
           src={selectedUser?.profileImageUrl}
@@ -76,9 +76,9 @@ const ChatRoom = ({ chatRoomId, selectedUser, onSendMessage, loggedInUser }) => 
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type your message..."
-          className="flex-1 p-2 border border-gray-400 rounded focus:outline-none focus:border-green-300"
+          className="flex-1 p-2 border border-gray-400 rounded focus:outline-none focus:border-orange-300"
         />
-        <button type="submit" className="ml-4 px-2 py-2 bg-green-500 text-white font-semibold rounded hover:bg-green-600 transition-colors duration-200">Send</button>
+        <button type="submit" className="ml-4 px-2 py-2 bg-orange-500 text-white font-semibold rounded hover:bg-orange-300 transition-colors duration-200">Send</button>
       </form>
     </div>
   );

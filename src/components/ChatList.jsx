@@ -1,10 +1,7 @@
-'use client'
 import React, { useEffect, useState } from "react";
 import { collection, query, getDocs, orderBy, onSnapshot, setDoc, doc, getDoc } from "firebase/firestore";
-
 import { db } from "@/app/firebase/config";
 import { useAuth } from "../app/context/AuthContext";
-import ChatRoom from "./ChatRoom";
 import SearchResult from "./SearchResult";
 
 // Utility function to fetch user data by user ID
@@ -41,15 +38,12 @@ const countUnseenMessages = async (chatRoomId, userId) => {
   }
 };
 
-const ChatList = () => {
+const ChatList = ({ setSelectedChatRoomId, setSelectedUser, setLoggedInUser }) => {
   const { user } = useAuth();
   const userId = user?.uid;
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [loggedInUser, setLoggedInUser] = useState(null);
 
   useEffect(() => {
     const fetchLoggedInUserData = async () => {
@@ -138,48 +132,8 @@ const ChatList = () => {
     setSelectedUser(userData);
 
     await markMessagesAsSeen(chatRoomId, userId);
-    // Clear the search query and results
     setSearchQuery('');
     setSearchResults([]);
-  };
-
-  const handleSendMessage = async (message) => {
-    if (!selectedUser) return;
-
-    const chatRoomId = createChatRoomId(userId, selectedUser.id);
-    const messageTimestamp = new Date();
-
-    const loggedInUserData = loggedInUser;
-
-    const loggedInUserDetails = {
-      id: userId,
-      firstName: loggedInUserData?.firstName || 'Unknown',
-      lastName: loggedInUserData?.lastName || 'User',
-      ...(loggedInUserData?.profileImageUrl && { profileImageUrl: loggedInUserData.profileImageUrl }),
-      lastMessageTimestamp: messageTimestamp,
-      lastMessage: {
-        senderId: userId,
-        text: message,
-        timestamp: messageTimestamp
-      }
-    };
-
-    const selectedChatUser = {
-      id: selectedUser.id,
-      firstName: selectedUser.firstName,
-      lastName: selectedUser.lastName,
-      ...(selectedUser?.profileImageUrl && { profileImageUrl: selectedUser.profileImageUrl }),
-      lastMessageTimestamp: messageTimestamp,
-      lastMessage: {
-        senderId: userId,
-        text: message,
-        timestamp: messageTimestamp
-      }
-    };
-
-    // Update both users' chat lists
-    await setDoc(doc(db, `users/${userId}/chats`, chatRoomId), selectedChatUser, { merge: true });
-    await setDoc(doc(db, `users/${selectedUser.id}/chats`, chatRoomId), loggedInUserDetails, { merge: true });
   };
 
   const createChatRoomId = (userId1, userId2) => {
@@ -187,70 +141,52 @@ const ChatList = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen w-full">
-      <div className="w-full md:w-1/3 border-r border-gray-300 flex flex-col relative">
-        <div className="bg-white p-4">
-          <h1 className="text-3xl font-bold text-green-400">Chats</h1>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search users..."
-            className="w-full mt-4 p-2 border border-gray-400 focus:border-green-300 rounded focus:outline-none"
-          />
-        </div>
-        <div className={`flex-1 overflow-y-auto ${users.length > 4 ? 'max-h-[calc(100vh-12rem)]' : ''}`}>
-          {users.map((user, index) => (
-            <div
-              key={user.id}
-              onClick={() => handleUserClick(user)}
-              className="p-4 cursor-pointer hover:bg-green-100 hover:border-green-400 hover:border-2 hover:rounded-lg m-2 transition-colors duration-200"
-            >
-              <div className="flex items-center">
-                <img
-                  src={user.profileImageUrl}
-                  alt={user.firstName}
-                  className="w-10 h-10 rounded-full mr-4"
-                />
-                <div className="flex-1">
-                  <div className="flex justify-between items-center">
-                    <p className="font-semibold text-black">{user.firstName} {user.lastName}</p>
-                    {user.unseenCount > 0 && (
-                      <span className="ml-2 text-xs text-red-500 font-semibold">
-                        {user.unseenCount}
-                      </span>
-                    )}
-                  </div>
-                  {user.lastMessage && (
-                    <div className="flex items-center mt-1">
-                      <p className="text-sm text-gray-600">{user.lastMessage.senderId === userId ? 'You' : user.firstName}: {user.lastMessage.text}</p>
-                    </div>
+    <div className="w-full md:w-1/3 flex flex-col relative">
+      <div className="bg-white p-4">
+        <h1 className="text-3xl font-bold text-green-400">Chats</h1>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search users..."
+          className="w-full mt-4 p-2 border border-gray-400 focus:border-green-300 rounded focus:outline-none"
+        />
+      </div>
+      <div className="flex-1 overflow-y-auto max-h-[calc(100vh-12rem)]">
+        {users.map((user) => (
+          <div
+            key={user.id}
+            onClick={() => handleUserClick(user)}
+            className="p-4 cursor-pointer hover:bg-green-100 hover:border-green-400 hover:border-2 hover:rounded-lg m-2 transition-colors duration-200"
+          >
+            <div className="flex items-center">
+              <img
+                src={user.profileImageUrl}
+                alt={user.firstName}
+                className="w-10 h-10 rounded-full mr-4"
+              />
+              <div className="flex-1">
+                <div className="flex justify-between items-center">
+                  <p className="font-semibold text-black">{user.firstName} {user.lastName}</p>
+                  {user.unseenCount > 0 && (
+                    <span className="ml-2 text-xs text-red-500 font-semibold">
+                      {user.unseenCount}
+                    </span>
                   )}
                 </div>
+                {user.lastMessage && (
+                  <div className="flex items-center mt-1">
+                    <p className="text-sm text-gray-600">{user.lastMessage.senderId === userId ? 'You' : user.firstName}: {user.lastMessage.text}</p>
+                  </div>
+                )}
               </div>
             </div>
-          ))}
-        </div>
-        {searchQuery && (
-          <SearchResult users={searchResults} onUserClick={handleUserClick} />
-        )}
-      </div>
-      <div className="w-full md:w-2/3 bg-white flex flex-col">
-        {selectedChatRoomId ? (
-          <div className="h-full w-full">
-            <ChatRoom
-              chatRoomId={selectedChatRoomId}
-              selectedUser={selectedUser}
-              onSendMessage={handleSendMessage}
-              loggedInUser={loggedInUser}
-            />
           </div>
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            Select a chat to start messaging
-          </div>
-        )}
+        ))}
       </div>
+      {searchQuery && (
+        <SearchResult users={searchResults} onUserClick={handleUserClick} />
+      )}
     </div>
   );
 };

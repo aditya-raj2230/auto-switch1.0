@@ -2,18 +2,30 @@
 import React, { useState } from "react";
 import ChatList from "../../components/ChatList";
 import ChatRoom from '../../components/ChatRoom';
-import AuthGuard from "@/components/AuthGaurd";
 import AuthGuard2 from "@/components/LoggedOutAuthGaurad";
 
 const ChatPage = () => {
-  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [loggedInUser, setLoggedInUser] = useState(null);
 
   return (
     <AuthGuard2>
-    <div className="flex w-full min-h-screen mb-20 mx-auto my-10 p-4 bg-white rounded-lg shadow-lg">
-      <ChatList />
-      
-    </div>
+      <div className="flex w-full h-[90vh]  bg-white rounded-lg shadow-lg">
+        <ChatList
+          setSelectedChatRoomId={setSelectedChatRoomId}
+          setSelectedUser={setSelectedUser}
+          setLoggedInUser={setLoggedInUser}
+        />
+        {selectedChatRoomId && (
+          <ChatRoom
+            chatRoomId={selectedChatRoomId}
+            selectedUser={selectedUser}
+            loggedInUser={loggedInUser}
+            onSendMessage={() => {}}
+          />
+        )}
+      </div>
     </AuthGuard2>
   );
 };
