@@ -1,14 +1,23 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { doc, getDoc, getFirestore, updateDoc, arrayUnion, arrayRemove, collection, getDocs, query, where } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  getFirestore,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+  collection,
+  getDocs,
+  setDoc,
+  query,
+} from "firebase/firestore";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import UserList from "@/components/UserList";
 import { db } from "@/app/firebase/config"; // Ensure this import is correct
-import CreatePostForm from "@/components/CreatePost";
-import PublicRequests from "@/components/PublicPosts";
 
 const GroupDetail = () => {
   const router = useRouter();
@@ -59,10 +68,12 @@ const GroupDetail = () => {
 
   const fetchVehicles = async () => {
     try {
-      const db = getFirestore();
-      const vehiclesQuery = query(collection(db, 'groups', id, 'marketplace'));
+      const vehiclesQuery = query(collection(db, "groups", id, "marketplace"));
       const vehiclesSnapshot = await getDocs(vehiclesQuery);
-      const vehiclesList = vehiclesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const vehiclesList = vehiclesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       setVehicles(vehiclesList);
     } catch (error) {
       console.error("Error fetching vehicles:", error);
@@ -79,7 +90,7 @@ const GroupDetail = () => {
       await updateDoc(groupRef, {
         members: arrayUnion(user.uid),
       });
-      setGroup(prevGroup => ({
+      setGroup((prevGroup) => ({
         ...prevGroup,
         members: [...prevGroup.members, user.uid],
       }));
@@ -95,11 +106,13 @@ const GroupDetail = () => {
       await updateDoc(groupRef, {
         members: arrayRemove(user.uid),
       });
-      setGroup(prevGroup => ({
+      setGroup((prevGroup) => ({
         ...prevGroup,
-        members: prevGroup.members.filter(member => member !== user.uid),
+        members: prevGroup.members.filter((member) => member !== user.uid),
       }));
-      fetchGroupMembersDetails(group.members.filter(member => member !== user.uid)); // Refetch member details
+      fetchGroupMembersDetails(
+        group.members.filter((member) => member !== user.uid)
+      ); // Refetch member details
     } catch (error) {
       console.error("Error exiting group:", error);
     }
@@ -109,6 +122,54 @@ const GroupDetail = () => {
     setShowModal(false);
     fetchGroupMembersDetails(group.members); // Refetch member details after modal close
   };
+
+  const createChatRoomId = (userId1, userId2) => {
+    // Ensure the chat room ID is the same regardless of the order of user IDs
+    return [userId1, userId2].sort().join("_");
+  };
+  const redirectToMessage = async (contactUserId) => {
+
+    try {
+      router.push('/chat')
+      const chatRoomId = createChatRoomId(userId, contactUserId);
+  
+      // Check if the chat room already exists
+      const chatRoomRef = doc(db, "chatRooms", chatRoomId);
+      const chatRoomDoc = await getDoc(chatRoomRef);
+  
+      if (!chatRoomDoc.exists()) {
+        // Create a new chat room if it doesn't exist
+        await setDoc(chatRoomRef, {
+          users: {
+            [userId]: true, // Current user
+            [contactUserId]: true, // Selected contact
+          },
+          createdAt: Timestamp.now(),
+          lastMessageTimestamp: null,
+        });
+      }
+  
+      // Update the state to display the chat room
+      setSelectedChatRoomId(chatRoomId);  // Set the chat room ID for the ChatRoom component
+  
+      // Fetch selected user data for display
+      const selectedUserData = await fetchUserData(contactUserId);
+      setSelectedUser(selectedUserData);  // Set the selected user for the ChatRoom component
+  
+      // Optionally, mark messages as seen if required
+      await markMessagesAsSeen(chatRoomId, userId);
+  
+      // Clear the search after selecting the chat
+      setSearchQuery('');
+      setSearchResults([]);
+  
+      
+    } catch (error) {
+      console.error("Error redirecting to chat:", error);
+    }
+  };
+  
+  
 
   if (loading) {
     return <div>Loading...</div>;
@@ -145,7 +206,7 @@ const GroupDetail = () => {
             <div
               key={index}
               className="bg-gray-100 p-2 rounded-md shadow-sm flex flex-col items-center"
-              style={{ width: '100%', height: '100px', overflow: 'hidden' }}
+              style={{ width: "100%", height: "100px", overflow: "hidden" }}
             >
               <img
                 src={member.profileImageUrl || "/default-avatar.png"}
@@ -201,7 +262,10 @@ const GroupDetail = () => {
         <h2 className="text-xl font-semibold">Marketplace Vehicles:</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
           {vehicles.map((vehicle) => (
-            <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div
+              key={vehicle.id}
+              className="bg-white rounded-lg shadow-md overflow-hidden"
+            >
               <img
                 src={vehicle.imageUrl || "/placeholder-image.png"}
                 alt={vehicle.model}
@@ -209,9 +273,17 @@ const GroupDetail = () => {
               />
               <div className="p-4">
                 <h3 className="text-lg font-semibold">{vehicle.model}</h3>
-                <p className="text-gray-600">Manufacturer: {vehicle.manufacturer}</p>
+                <p className="text-gray-600">
+                  Manufacturer: {vehicle.manufacturer}
+                </p>
                 <p className="text-gray-600">Year: {vehicle.year}</p>
-                <p className="text-gray-600">Location: {vehicle.city}, {vehicle.state}</p>
+             
+                <button
+                  onClick={() => redirectToMessage(vehicle.ownerId)}
+                  className="bg-blue-500 text-white px-4 py-2 mt-2 rounded hover:bg-blue-700"
+                >
+                  Contact Seller
+                </button>
               </div>
             </div>
           ))}

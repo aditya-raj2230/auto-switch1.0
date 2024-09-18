@@ -11,7 +11,7 @@ const ChatPage = () => {
 
   return (
     <AuthGuard2>
-      <div className="flex w-full h-[90vh]  bg-white rounded-lg shadow-lg">
+      <div className="flex w-full h-[90vh] mt-4 bg-white rounded-lg shadow-lg">
         <ChatList
           setSelectedChatRoomId={setSelectedChatRoomId}
           setSelectedUser={setSelectedUser}
