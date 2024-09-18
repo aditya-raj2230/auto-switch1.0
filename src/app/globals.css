@@ -5,44 +5,41 @@
 body {
     @apply bg-gray-100 text-gray-900;
   }
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+  }
+  
+  .carousel-container {
+    height: 100vh;
+  }
   
   .container {
     @apply max-w-md mx-auto p-4;
   }
 
-  @keyframes move {
-    0% {
-      transform: translate(0, 0);
+ 
+  @keyframes rotateClockwise {
+    from {
+      transform: rotate(0deg);
     }
-    25% {
-      transform: translate(50px, -30px);
-    }
-    50% {
-      transform: translate(-30px, 50px);
-    }
-    75% {
-      transform: translate(30px, 30px);
-    }
-    100% {
-      transform: translate(0, 0);
+    to {
+      transform: rotate(360deg);
     }
   }
-  @keyframes moveAcrossScreen {
-    0% {
-      transform: translate(0, 0);
-    }
-    25% {
-      transform: translate(80vw, 10vh);
-    }
-    50% {
-      transform: translate(-50vw, 70vh);
-    }
-    75% {
-      transform: translate(30vw, -50vh);
-    }
-    100% {
-      transform: translate(0, 0);
-    }
+  
+  .carousel-item {
+    transition: transform 0.3s ease-in-out;
   }
+  
+  .carousel-item:hover {
+    transform: scale(1.1); /* Make the box grow when hovered */
+    cursor: pointer;
+  }
+  
+  
+  
   
   
