@@ -69,7 +69,7 @@ const UserProfile = ({ selectedUserId }) => {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto my-10 p-4 bg-white rounded-lg shadow-lg relative">
+    <div className="w-full max-w-md mx-auto my-10 p-4 bg-red-50 rounded-lg shadow-lg relative">
       <div className="text-center">
         {bannerImageUrl ? (
           <img

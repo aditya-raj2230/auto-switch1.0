@@ -43,28 +43,29 @@ const Page = () => {
   }, [userId]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center h-screen bg-white text-gray-700">Loading...</div>;
   }
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen mb-20">
+    <div className="flex flex-col md:flex-row min-h-screen mb-20 bg-white">
       {!userId ? (
-        <div className="w-full bg-white">
+        <div className="w-full bg-orange-100"> {/* Updated background color for better contrast */}
           <Hero />
         </div>
       ) : (
         <>
-          <div className="w-full md:w-1/3 p-4">
+          <div className="w-full md:w-1/3 p-4 bg-white rounded-lg"> {/* Updated with light background */}
             <UserProfile selectedUserId={userId} />
             <button
-              onClick={() => setShowUploadVehicle(true)} // Show the UploadVehicle component on button click
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4"
+              onClick={() => setShowUploadVehicle(true)}
+              className="bg-black text-white px-4 py-2 rounded hover:bg-black transition-colors duration-300 mb-4"
             >
               Upload Vehicle
             </button>
             {showUploadVehicle && <UploadVehicle userData={userData} userId={userId} />}
           </div>
-          <div className="w-full md:w-2/3 p-4">
+
+          <div className="w-full md:w-2/3 p-4 bg-white rounded-lg"> {/* Updated with light tan background */}
             <GroupList />
           </div>
         </>
@@ -74,3 +75,4 @@ const Page = () => {
 };
 
 export default Page;
+
