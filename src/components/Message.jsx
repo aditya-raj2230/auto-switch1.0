@@ -2,7 +2,7 @@ import React from "react";
 
 const Message = ({ message, isOwnMessage }) => {
   const messageClasses = isOwnMessage
-    ? " bg-green-500 text-white self-end"
+    ? " bg-orange-100 text-black self-end"
     : "bg-gray-200 text-gray-800 self-start";
 
   return (
