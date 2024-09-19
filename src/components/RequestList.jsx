@@ -76,15 +76,27 @@ const RequestList = ({ userId }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {requests.map(request => (
             <div key={request.id} className="p-2 border rounded-md shadow-sm flex flex-col">
-              <div className="flex-shrink-0 mb-2">
-                <img src={request.vehicleDetails.imageUrl} alt="Vehicle" className="rounded-lg shadow-md w-full h-32 object-cover" />
-              </div>
+              {request.vehicleDetails ? (
+                <>
+                  <div className="flex-shrink-0 mb-2">
+                    <img 
+                      src={request.vehicleDetails.imageUrl} 
+                      alt="Vehicle" 
+                      className="rounded-lg shadow-md w-full h-32 object-cover" 
+                    />
+                  </div>
+                  <div className="flex-grow">
+                    <h3 className="text-lg font-bold text-green-700 mb-1">
+                      {request.vehicleDetails.manufacturer} {request.vehicleDetails.model}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-1">Year: {request.vehicleDetails.year}</p>
+                    <p className="text-gray-600 text-sm mb-1">Location: {request.vehicleDetails.city}, {request.vehicleDetails.state}</p>
+                  </div>
+                </>
+              ) : (
+                <p className="text-gray-600 text-sm mb-2">Vehicle details are not available.</p>
+              )}
               <div className="flex-grow">
-                <h3 className="text-lg font-bold text-green-700 mb-1">
-                  {request.vehicleDetails.manufacturer} {request.vehicleDetails.model}
-                </h3>
-                <p className="text-gray-600 text-sm mb-1">Year: {request.vehicleDetails.year}</p>
-                <p className="text-gray-600 text-sm mb-1">Location: {request.vehicleDetails.city}, {request.vehicleDetails.state}</p>
                 <p className="text-gray-600 text-sm mb-1">Start Date: {request.startDate}</p>
                 <p className="text-gray-600 text-sm mb-1">End Date: {request.endDate}</p>
                 <p className="text-gray-600 text-sm mb-1">Bidding Price: ${request.biddingPrice}</p>

@@ -149,28 +149,9 @@ const Navbar2 = () => {
                   />
                 </Link>
               </li>
-              <li className="navbar-icon">
-                <Link href="/requests">
-                  <Image
-                    src="/handshake.png"
-                    alt="Requests"
-                    width={40}
-                    height={40}
-                    className="cursor-pointer"
-                  />
-                </Link>
-              </li>
-              <li className="navbar-icon hidden md:block">
-                <Link href="/addFriends">
-                  <Image
-                    src="/users-alt.png"
-                    alt="Add Friends"
-                    width={40}
-                    height={40}
-                    className="cursor-pointer"
-                  />
-                </Link>
-              </li>
+              
+             
+             
               <li className="navbar-icon">
                 <Link href="/chat">
                   <Image
