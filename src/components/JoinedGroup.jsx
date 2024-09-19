@@ -38,12 +38,12 @@ const GroupsYouHaveJoined = ({ onSelectGroup }) => { // Add onSelectGroup prop
   }
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4 text-green-600">Groups You Have Joined</h2>
+    <div className="p-4 bg-white ">
+      <h2 className="text-xl font-bold mb-4 text-black">Groups You Have Joined</h2>
       <ul className="space-y-2">
         {/* Add 'All' option */}
         <li
-          className="bg-gray-100 p-2 rounded-md shadow-sm cursor-pointer"
+          className="bg-white p-2 rounded-md shadow-sm cursor-pointer"
           onClick={() => onSelectGroup(null)} // Passing null resets to all vehicles
         >
           <h3 className="text-lg font-semibold">All Vehicles</h3>
@@ -51,7 +51,7 @@ const GroupsYouHaveJoined = ({ onSelectGroup }) => { // Add onSelectGroup prop
         {groups.map((group) => (
           <li
             key={group.id}
-            className="bg-gray-100 p-2 rounded-md shadow-sm cursor-pointer"
+            className="bg-white p-2 rounded-md shadow-sm transition-transform duration-300 ease-in-out hover:bg-orange-100 hover:scale-105 cursor-pointer"
             onClick={() => onSelectGroup(group.id)} // Passing selected group ID
           >
             <h3 className="text-lg font-semibold">{group.name}</h3>

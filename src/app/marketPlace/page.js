@@ -1,22 +1,22 @@
 'use client';
 import React, { useState, useEffect } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { ref, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/app/firebase/config";
 import CheckAvailabilityModal from "../../components/CheckAvailabilityModal";
 import { useAuth } from "../context/AuthContext";
-import GroupsYouHaveJoined from "../../components/JoinedGroup"; // Import the GroupsYouHaveJoined component
+import GroupsYouHaveJoined from "../../components/JoinedGroup";
 
 const Marketplace = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedVehicle, setSelectedVehicle] = useState(null); // State to manage selected vehicle for modal
-  const [modalOpen, setModalOpen] = useState(false); // State to manage modal visibility
-  const [searchTerm, setSearchTerm] = useState(""); // State to manage search term
-  const [selectedCity, setSelectedCity] = useState(""); // State to manage selected city filter
-  const [vehicleType, setVehicleType] = useState(""); // State to manage vehicle type filter
-  const [cities, setCities] = useState([]); // State to store available cities
-  const [selectedGroupId, setSelectedGroupId] = useState(null); // State to manage selected group ID
+  const [selectedVehicle, setSelectedVehicle] = useState(null); 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const [selectedCity, setSelectedCity] = useState(""); 
+  const [vehicleType, setVehicleType] = useState("");
+  const [cities, setCities] = useState([]);
+  const [selectedGroupId, setSelectedGroupId] = useState(null);
   const { user } = useAuth();
   const userId = user.uid;
 
@@ -24,8 +24,6 @@ const Marketplace = () => {
     const fetchMarketplaceVehicles = async () => {
       try {
         let vehiclesQuery;
-
-        // Fetch vehicles based on selected group or fetch all vehicles
         if (selectedGroupId) {
           vehiclesQuery = collection(db, 'groups', selectedGroupId, 'marketplace');
         } else {
@@ -45,7 +43,6 @@ const Marketplace = () => {
         );
         setVehicles(vehicleList);
 
-        // Extract unique cities from vehicleList for the filter
         const uniqueCities = [...new Set(vehicleList.map((vehicle) => vehicle.city))];
         setCities(uniqueCities);
       } catch (error) {
@@ -56,15 +53,15 @@ const Marketplace = () => {
     };
 
     fetchMarketplaceVehicles();
-  }, [selectedGroupId]); // Refetch vehicles when selected group changes
+  }, [selectedGroupId]);
 
   const handleVehicleClick = (vehicle) => {
     setSelectedVehicle(vehicle);
-    setModalOpen(true); // Open modal when a vehicle is clicked
+    setModalOpen(true); 
   };
 
   const handleCloseModal = () => {
-    setModalOpen(false); // Close modal
+    setModalOpen(false); 
   };
 
   const handleSearch = (e) => {
@@ -93,24 +90,26 @@ const Marketplace = () => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row mt-10 mb-20">
-      {/* Left side: GroupsYouHaveJoined component */}
-      <div className="w-full md:w-1/3 p-4">
-        <GroupsYouHaveJoined onSelectGroup={setSelectedGroupId} /> {/* Handle group selection */}
+    <div className="flex flex-col md:flex-row mt-10 mb-20 bg-white">
+      {/* Groups You've Joined */}
+      <div className="w-full md:w-1/3 p-4 bg-white">
+        
+          <GroupsYouHaveJoined onSelectGroup={setSelectedGroupId} />
+      
       </div>
 
+      {/* Vehicle Listings */}
       <div className="overflow-y-auto w-full md:w-2/3 p-4" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
-        {/* Marketplace Filters and Items */}
-        <div className="p-4 mx-auto max-w-3xl">
-          <div className="flex flex-col md:flex-row md:justify-between mb-4 items-center">
-            {/* Search Bar */}
-            <div className="relative w-full md:w-1/3 mb-4 md:mb-0">
+        <div className="p-4 mx-auto max-w-3xl bg-white">
+          <div className="flex flex-col md:flex-row md:justify-between mb-4 items-center gap-6">
+            <div className="relative w-full md:w-1/3 ">
               <input
                 type="text"
                 placeholder="Search by model or manufacturer"
                 value={searchTerm}
                 onChange={handleSearch}
-                className="w-full p-2 pl-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+                className="w-full p-2 pl-10 border border-orange-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                style={{ height: "40px" }}
               />
               <img
                 src="/magnifying-glass.png"
@@ -118,12 +117,12 @@ const Marketplace = () => {
                 className="absolute left-3 top-2.5 w-5 h-5"
               />
             </div>
-            {/* City Filter */}
-            <div className="relative w-full md:w-1/4 mb-4 md:mb-0">
+            <div className="relative w-full md:w-1/4">
               <select
                 value={selectedCity}
                 onChange={handleCityChange}
-                className="w-full p-2 pl-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+                className="w-full p-2 pl-10 border border-orange-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                style={{ height: "40px" }}
               >
                 <option value="">All Cities</option>
                 {cities.map((city) => (
@@ -133,17 +132,17 @@ const Marketplace = () => {
                 ))}
               </select>
               <img
-                  src="/filter.png"
-                  alt="Filter"
-                  className="absolute left-3 top-2.5 w-5 h-5"
-                />
-              </div>
-            {/* Vehicle Type Filter */}
+                src="/filter.png"
+                alt="Filter"
+                className="absolute left-3 top-2.5 w-5 h-5"
+              />
+            </div>
             <div className="relative w-full md:w-1/4">
               <select
                 value={vehicleType}
                 onChange={handleVehicleTypeChange}
-                className="w-full p-2 pl-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+                className="w-full p-2 pl-10 border border-orange-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                style={{ height: "40px" }}
               >
                 <option value="">All Types</option>
                 <option value="car">Car</option>
@@ -159,18 +158,27 @@ const Marketplace = () => {
 
           {!modalOpen && (
             <>
-              <h2 className="text-2xl font-bold mb-4 text-center text-green-600">Marketplace</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <h2 className="text-2xl font-bold mb-4 text-center text-black-300">Marketplace</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {filteredVehicles.map((vehicle) => (
                   <div
                     key={vehicle.id}
-                    className="p-4 bg-white rounded-lg shadow-sm transition duration-300 ease-in-out transform hover:bg-green-100 hover:scale-105"
+                    className="p-4 bg-white rounded-lg shadow-lg transition-transform duration-300 ease-in-out hover:bg-orange-100 hover:scale-105 cursor-pointer"
                     onClick={() => handleVehicleClick(vehicle)}
                   >
-                    <img src={vehicle.imageUrl} alt={vehicle.model} className="w-full h-48 object-cover rounded-md" />
-                    <div className="mt-2">
-                      <h3 className="text-lg font-semibold">{vehicle.manufacturer} {vehicle.model}</h3>
-                      <p className="text-sm text-gray-600">{vehicle.city}</p>
+                    {/* Image section */}
+                    <img src={vehicle.imageUrl} alt={vehicle.model} className="w-full h-40 object-cover rounded-t-lg" />
+
+                    {/* Vehicle details */}
+                    <div className="p-4">
+                      <h3 className="text-lg font-bold text-gray-800">{vehicle.manufacturer} {vehicle.model}</h3>
+                      <div className="flex items-center mt-2">
+                       
+                        <p className="text-gray-600">{vehicle.city}</p>
+                      </div>
+
+                      {/* Redundant Visit Profile Button */}
+                      <button className="mt-4 w-full bg-black text-white py-2 rounded-lg">Visit Profile</button>
                     </div>
                   </div>
                 ))}
@@ -178,14 +186,13 @@ const Marketplace = () => {
             </>
           )}
 
-          {/* Modal component */}
           {modalOpen && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
               <div className="bg-white p-4 rounded-lg shadow-lg">
                 <CheckAvailabilityModal
                   vehicleDetails={selectedVehicle}
-                  onRequestSend={handleCloseModal} // Handle request send
-                  onClose={handleCloseModal} // Close modal
+                  onRequestSend={handleCloseModal}
+                  onClose={handleCloseModal}
                   userId={userId}
                 />
               </div>
