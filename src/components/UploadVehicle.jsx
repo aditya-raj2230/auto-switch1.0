@@ -1,6 +1,7 @@
-'use client'
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, getDocs, query, where } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter } from 'next/navigation';
 
@@ -32,6 +33,8 @@ const UploadVehicle = ({ userId }) => {
     pincode: '',
     image: null,
     addToMarketplace: false,
+    putForSale: false,
+    price: '',
     selectedGroups: [],
   });
 
@@ -39,17 +42,26 @@ const UploadVehicle = ({ userId }) => {
   const [error, setError] = useState(null);
   const [pincodeValid, setPincodeValid] = useState(true);
   const [groups, setGroups] = useState([]);
+  const [userFullName, setUserFullName] = useState('');
   const router = useRouter();
 
   useEffect(() => {
-    const fetchGroups = async () => {
+    const fetchGroupsAndUser = async () => {
       const db = getFirestore();
+
+      // Fetch user's full name
+      const userDoc = await getDoc(doc(db, 'users', userId));
+      if (userDoc.exists()) {
+        setUserFullName(`${userDoc.data().firstName} ${userDoc.data().lastName}`);
+      }
+
+      // Fetch groups where user is a member
       const groupsQuery = query(collection(db, 'groups'), where('members', 'array-contains', userId));
       const groupDocs = await getDocs(groupsQuery);
       const groupList = groupDocs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setGroups(groupList);
     };
-    fetchGroups();
+    fetchGroupsAndUser();
   }, [userId]);
 
   const handleChange = (e) => {
@@ -99,240 +111,232 @@ const UploadVehicle = ({ userId }) => {
     setLoading(true);
 
     if (!pincodeValid) {
-      setError('Invalid pincode.');
+      setError('Invalid Pincode');
       setLoading(false);
       return;
     }
 
-    const db = getFirestore();
-    const storage = getStorage();
-
     try {
-      let imageUrl = '';
+      const db = getFirestore();
+      const storage = getStorage();
+
+      // Upload image to Firebase Storage
+      let imageUrl = null;
       if (formData.image) {
-        const storageRef = ref(storage, `vehicles/${formData.image.name}`);
-        await uploadBytes(storageRef, formData.image);
-        imageUrl = await getDownloadURL(storageRef);
+        const storageRef = ref(storage, `vehicles/${userId}/${formData.image.name}`);
+        const snapshot = await uploadBytes(storageRef, formData.image);
+        imageUrl = await getDownloadURL(snapshot.ref);
       }
 
+      // Add vehicle details to Firestore
       const vehicleData = {
-        type: formData.type,
-        manufacturer: formData.manufacturer,
-        model: formData.model,
-        year: formData.year,
-        addressLine1: formData.addressLine1,
-        addressLine2: formData.addressLine2,
-        city: formData.city,
-        state: formData.state,
-        pincode: formData.pincode,
+        ...formData,
+        userId,
         imageUrl,
-        ownerId: userId,
+        userFullName,
       };
-
-      await addDoc(collection(db, 'users', userId, 'vehicles'), vehicleData);
-
-      if (formData.addToMarketplace) {
-        await addDoc(collection(db, 'marketplace'), vehicleData);
-      }
-
-      for (const groupId of formData.selectedGroups) {
-        await addDoc(collection(db, 'groups', groupId, 'marketplace'), vehicleData);
-      }
-
-      setFormData({
-        type: 'car',
-        manufacturer: '',
-        model: '',
-        year: '',
-        addressLine1: '',
-        addressLine2: '',
-        city: '',
-        state: '',
-        pincode: '',
-        image: null,
-        addToMarketplace: false,
-        selectedGroups: [],
-      });
-
-      setLoading(false);
-      router.push('/edit');
+      await addDoc(collection(db, 'vehicles'), vehicleData);
+      
+      router.push('/marketplace');
     } catch (error) {
-      setError('Error adding document: ', error);
+      setError('Error uploading vehicle');
+      console.error(error);
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
-      <div className="p-8 max-w-md mx-auto bg-white rounded-xl shadow-md space-y-6">
-        <h2 className="text-3xl font-bold text-center text-indigo-600">Add Vehicle</h2>
-        {error && <p className="text-red-500 text-center">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Type</label>
+    <div className="bg-white rounded-lg p-8 shadow-lg">
+      <h2 className="text-2xl font-bold mb-6">Upload Your Vehicle</h2>
+      <form onSubmit={handleSubmit}>
+        {/* Form Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="form-group">
+            <label className="block font-semibold mb-1">Vehicle Type</label>
             <select
               name="type"
               value={formData.type}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
-              required
+              className="w-full p-2 border border-gray-300 rounded"
             >
               <option value="car">Car</option>
               <option value="bike">Bike</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Manufacturer</label>
+          <div className="form-group">
+            <label className="block font-semibold mb-1">Manufacturer</label>
             <input
               type="text"
               name="manufacturer"
               value={formData.manufacturer}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+              className="w-full p-2 border border-gray-300 rounded"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Model</label>
+          <div className="form-group">
+            <label className="block font-semibold mb-1">Model</label>
             <input
               type="text"
               name="model"
               value={formData.model}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+              className="w-full p-2 border border-gray-300 rounded"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Year</label>
+          <div className="form-group">
+            <label className="block font-semibold mb-1">Year</label>
             <input
-              type="number"
+              type="text"
               name="year"
               value={formData.year}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+              className="w-full p-2 border border-gray-300 rounded"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Address Line 1</label>
+          {/* Address Fields */}
+          <div className="form-group">
+            <label className="block font-semibold mb-1">Address Line 1</label>
             <input
               type="text"
               name="addressLine1"
               value={formData.addressLine1}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+              className="w-full p-2 border border-gray-300 rounded"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Address Line 2</label>
+          <div className="form-group">
+            <label className="block font-semibold mb-1">Address Line 2</label>
             <input
               type="text"
               name="addressLine2"
               value={formData.addressLine2}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+              className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">City</label>
+          <div className="form-group">
+            <label className="block font-semibold mb-1">City</label>
             <input
               type="text"
               name="city"
               value={formData.city}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+              className="w-full p-2 border border-gray-300 rounded"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">State</label>
+          <div className="form-group">
+            <label className="block font-semibold mb-1">State</label>
             <select
               name="state"
               value={formData.state}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+              className="w-full p-2 border border-gray-300 rounded"
               required
             >
               {indianStates.map((state) => (
-                <option key={state} value={state}>
-                  {state}
-                </option>
+                <option key={state} value={state}>{state}</option>
               ))}
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Pincode</label>
+          <div className="form-group">
+            <label className="block font-semibold mb-1">Pincode</label>
             <input
               type="text"
               name="pincode"
               value={formData.pincode}
               onChange={handlePincodeChange}
-              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 ${!pincodeValid ? 'border-red-500' : ''}`}
+              className={`w-full p-2 border border-gray-300 rounded ${pincodeValid ? '' : 'border-red-500'}`}
               required
             />
-            {!pincodeValid && <p className="text-red-500 text-sm">Invalid Pincode</p>}
+            {!pincodeValid && (
+              <span className="text-red-500 text-sm">Invalid Pincode</span>
+            )}
           </div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Upload Image</label>
-            <input
-              type="file"
-              name="image"
-              onChange={handleFileChange}
-              className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-            />
-          </div>
+        {/* Image Upload */}
+        <div className="form-group mt-4">
+          <label className="block font-semibold mb-1">Vehicle Image</label>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              <input
-                type="checkbox"
-                name="addToMarketplace"
-                checked={formData.addToMarketplace}
-                onChange={() => setFormData(prevData => ({ ...prevData, addToMarketplace: !prevData.addToMarketplace }))}
-              />
-              Add to Marketplace
-            </label>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Select Groups</label>
+        {/* Groups */}
+        <div className="form-group mt-4">
+          <label className="block font-semibold mb-1">Select Groups to Share With</label>
+          <div className="grid grid-cols-2 gap-2">
             {groups.map(group => (
-              <div key={group.id}>
-                <label className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.selectedGroups.includes(group.id)}
-                    onChange={() => handleGroupSelection(group.id)}
-                    className="form-checkbox h-5 w-5 text-indigo-600"
-                  />
-                  <span className="ml-2 text-gray-700">{group.name}</span>
-                </label>
-              </div>
+              <label key={group.id} className="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  value={group.id}
+                  checked={formData.selectedGroups.includes(group.id)}
+                  onChange={() => handleGroupSelection(group.id)}
+                  className="form-checkbox"
+                />
+                <span className="ml-2">{group.groupName}</span>
+              </label>
             ))}
           </div>
+        </div>
 
-          <div className="text-center">
-            <button
-              type="submit"
-              className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              disabled={loading}
-            >
-              {loading ? 'Submitting...' : 'Submit'}
-            </button>
+        {/* Checkbox and Submit */}
+        <div className="form-group mt-4">
+          <label className="inline-flex items-center">
+            <input
+              type="checkbox"
+              name="addToMarketplace"
+              checked={formData.addToMarketplace}
+              onChange={(e) => setFormData({ ...formData, addToMarketplace: e.target.checked })}
+              className="form-checkbox"
+            />
+            <span className="ml-2">Add to Marketplace</span>
+          </label>
+        </div>
+
+        {formData.addToMarketplace && (
+          <div className="form-group mt-4">
+            <label className="block font-semibold mb-1">Price (in INR)</label>
+            <input
+              type="text"
+              name="price"
+              value={formData.price}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              required
+            />
           </div>
-        </form>
-      </div>
+        )}
+
+        {error && (
+          <div className="text-red-500 mt-4">{error}</div>
+        )}
+
+        <button
+          type="submit"
+          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mt-4"
+          disabled={loading}
+        >
+          {loading ? 'Uploading...' : 'Upload Vehicle'}
+        </button>
+      </form>
     </div>
   );
 };

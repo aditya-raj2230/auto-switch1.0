@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Carousel from "./Corousal"; // Updated Carousel component
 
 const Hero = () => {
   const [universities, setUniversities] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredUniversities, setFilteredUniversities] = useState([]);
 
-  // Fetching universities using a free API
   useEffect(() => {
     const fetchUniversities = async () => {
       const response = await fetch(
@@ -21,7 +19,6 @@ const Hero = () => {
     fetchUniversities();
   }, []);
 
-  // Filtering universities based on search term
   useEffect(() => {
     if (searchTerm) {
       const filtered = universities.filter((uni) =>
@@ -45,7 +42,7 @@ const Hero = () => {
             Join Your Campus Car Community
           </h1>
           <p className="text-lg font-light text-gray-600 mb-4 text-center xl:text-left max-w-md">
-            Buy, sell, or rent vehicles within your campus.
+            Buy, sell, or rent vehicles securely within your campus.
           </p>
 
           {/* Input box and button directly under the text */}
@@ -103,10 +100,82 @@ const Hero = () => {
         <div className="absolute bottom-1/2 right-1/2 bg-red-500 opacity-30 w-36 h-32 rounded-full blur-2xl animate-[moveAcrossScreen_15s_linear_infinite]"></div>
       </section>
 
-      {/* Bottom Carousel */}
-      <div className="relative w-full h-96 bg-gray-100 p-4">
-        <Carousel />
-      </div>
+      {/* Security and Signup Section */}
+      <section className="relative w-full bg-white py-12 px-6 lg:px-12 flex flex-col items-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+          Your Security is Our Priority
+        </h2>
+        <p className="text-lg text-gray-600 max-w-3xl text-center mb-8">
+          We ensure that your transactions and personal data are encrypted and
+          secure. Join a trusted platform to connect with your university's
+          community confidently.
+        </p>
+        <div className="flex gap-4">
+          <button
+            className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-300"
+            onClick={() => window.location.href = "/auth/signup"}
+          >
+            Sign Up
+          </button>
+          <button
+            className="bg-gray-500 text-white py-2 px-6 rounded-lg hover:bg-gray-600 transition duration-300"
+            onClick={() => window.location.href = "/auth/login"}
+          >
+            Login
+          </button>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="relative w-full py-12 px-6 lg:px-12 bg-gray-50 flex flex-col items-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+          Why Choose Our Platform?
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="p-6 bg-white rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-2">Secure Connections</h3>
+            <p className="text-gray-600">
+              All communication between users is encrypted, ensuring your data
+              stays safe and private.
+            </p>
+          </div>
+          <div className="p-6 bg-white rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-2">Community-Driven</h3>
+            <p className="text-gray-600">
+              Connect with people from your university and build meaningful
+              relationships within a trusted network.
+            </p>
+          </div>
+          <div className="p-6 bg-white rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold mb-2">Easy Onboarding</h3>
+            <p className="text-gray-600">
+              Getting started is quick and easy, with a seamless sign-up
+              experience to get you connected fast.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter Section */}
+      <section className="relative w-full bg-gray-100 py-12 px-6 lg:px-12 flex flex-col items-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+          Stay Updated
+        </h2>
+        <p className="text-lg text-gray-600 max-w-2xl text-center mb-8">
+          Subscribe to our newsletter to receive updates on new features,
+          community events, and exclusive offers.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="px-4 py-2 w-full sm:w-auto text-black border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition duration-300">
+            Subscribe
+          </button>
+        </div>
+      </section>
     </div>
   );
 };

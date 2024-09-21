@@ -63,7 +63,7 @@ const UserProfile = ({ selectedUserId }) => {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto my-6 p-6 bg-orange-50 rounded-lg shadow-lg relative">
+    <div className="w-full max-w-md mx-auto my-6 p-6 bg-gray-50 rounded-lg shadow-lg relative">
       <div className="text-center mb-4">
         {bannerImageUrl ? (
           <img
@@ -72,7 +72,7 @@ const UserProfile = ({ selectedUserId }) => {
             className="w-full h-32 object-cover rounded-t-lg"
           />
         ) : (
-          <div className="w-full h-32 bg-orange-200 rounded-t-lg"></div>
+          <div className="w-full h-32 bg-gray-200 rounded-t-lg"></div>
         )}
 
         <div className="relative -mt-12">
@@ -90,16 +90,16 @@ const UserProfile = ({ selectedUserId }) => {
         </div>
       </div>
 
-      <h1 className="text-2xl font-bold text-orange-800">{userData.firstName} {userData.lastName}</h1>
+      <h1 className="text-2xl font-bold text-gray-800">{userData.firstName} {userData.lastName}</h1>
       <p className="text-md text-gray-600 mb-4">{userData.bio}</p>
 
       <div className="flex justify-around my-4 text-center">
         <div>
-          <p className="text-orange-800 font-bold">{userData.followerCount}</p>
+          <p className="text-gray-800 font-bold">{userData.followerCount}</p>
           <Link href="/profile/followers" className="text-gray-600">Followers</Link>
         </div>
         <div>
-          <p className="text-orange-800 font-bold">{userData.followingCount}</p>
+          <p className="text-gray-800 font-bold">{userData.followingCount}</p>
           <Link href="/profile/following" className="text-gray-600">Following</Link>
         </div>
       </div>
@@ -111,7 +111,7 @@ const UserProfile = ({ selectedUserId }) => {
       <div className="text-center mb-4">
         {auth.currentUser?.uid === selectedUserId && (
           <button
-            className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600"
+            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
             onClick={handleEdit}
           >
             Finish Profile
@@ -120,7 +120,7 @@ const UserProfile = ({ selectedUserId }) => {
       </div>
 
       <div className="mt-6">
-        <h2 className="text-lg font-bold mb-2 text-orange-800">User Vehicles</h2>
+        <h2 className="text-lg font-bold mb-2 text-gray-800">User Vehicles</h2>
         <VehicleList userId={selectedUserId || auth.currentUser?.uid} />
       </div>
     </div>
