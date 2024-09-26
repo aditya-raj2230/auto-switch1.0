@@ -58,7 +58,7 @@ const UploadVehicle = ({ userId }) => {
       // Fetch groups where user is a member
       const groupsQuery = query(collection(db, 'groups'), where('members', 'array-contains', userId));
       const groupDocs = await getDocs(groupsQuery);
-      const groupList = groupDocs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const groupList = groupDocs.docs.map(doc => ({ id: doc.id, groupName: doc.data().name, ...doc.data() }));
       setGroups(groupList);
     };
     fetchGroupsAndUser();
@@ -150,7 +150,6 @@ const UploadVehicle = ({ userId }) => {
     <div className="bg-white rounded-lg p-8 shadow-lg">
       <h2 className="text-2xl font-bold mb-6">Upload Your Vehicle</h2>
       <form onSubmit={handleSubmit}>
-        {/* Form Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="form-group">
             <label className="block font-semibold mb-1">Vehicle Type</label>
@@ -201,7 +200,6 @@ const UploadVehicle = ({ userId }) => {
             />
           </div>
 
-          {/* Address Fields */}
           <div className="form-group">
             <label className="block font-semibold mb-1">Address Line 1</label>
             <input
@@ -268,36 +266,39 @@ const UploadVehicle = ({ userId }) => {
           </div>
         </div>
 
-        {/* Image Upload */}
         <div className="form-group mt-4">
           <label className="block font-semibold mb-1">Vehicle Image</label>
           <input
             type="file"
+            accept="image/*"
             onChange={handleFileChange}
             className="w-full p-2 border border-gray-300 rounded"
+            required
           />
         </div>
 
-        {/* Groups */}
         <div className="form-group mt-4">
           <label className="block font-semibold mb-1">Select Groups to Share With</label>
           <div className="grid grid-cols-2 gap-2">
-            {groups.map(group => (
-              <label key={group.id} className="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  value={group.id}
-                  checked={formData.selectedGroups.includes(group.id)}
-                  onChange={() => handleGroupSelection(group.id)}
-                  className="form-checkbox"
-                />
-                <span className="ml-2">{group.groupName}</span>
-              </label>
-            ))}
+            {groups.length > 0 ? (
+              groups.map(group => (
+                <label key={group.id} className="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    value={group.id}
+                    checked={formData.selectedGroups.includes(group.id)}
+                    onChange={() => handleGroupSelection(group.id)}
+                    className="form-checkbox"
+                  />
+                  <span className="ml-2">{group.groupName}</span>
+                </label>
+              ))
+            ) : (
+              <p>No groups found</p>
+            )}
           </div>
         </div>
 
-        {/* Checkbox and Submit */}
         <div className="form-group mt-4">
           <label className="inline-flex items-center">
             <input
