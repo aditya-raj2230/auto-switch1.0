@@ -1,24 +1,7 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, doc, getDoc, query, where, serverTimestamp } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter } from 'next/navigation';
-
-const indianStates = [
-  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
-  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
-  'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
-  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
-  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
-  'Uttar Pradesh', 'Uttarakhand', 'West Bengal'
-];
-
-const validatePincode = async (pincode) => {
-  const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
-  const data = await response.json();
-  return data[0].Status === 'Success';
-};
 
 const UploadVehicle = ({ userId }) => {
   const [formData, setFormData] = useState({
@@ -45,6 +28,7 @@ const UploadVehicle = ({ userId }) => {
   const [userFullName, setUserFullName] = useState('');
   const router = useRouter();
 
+  // Fetch groups and user's full name
   useEffect(() => {
     const fetchGroupsAndUser = async () => {
       const db = getFirestore();
@@ -58,12 +42,19 @@ const UploadVehicle = ({ userId }) => {
       // Fetch groups where user is a member
       const groupsQuery = query(collection(db, 'groups'), where('members', 'array-contains', userId));
       const groupDocs = await getDocs(groupsQuery);
-      const groupList = groupDocs.docs.map(doc => ({ id: doc.id, groupName: doc.data().name, ...doc.data() }));
+      const groupList = groupDocs.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setGroups(groupList);
     };
     fetchGroupsAndUser();
   }, [userId]);
 
+  // Mock pincode validation function (replace this with actual API call if needed)
+  const validatePincode = async (pincode) => {
+    // This is a simple mock that checks if the pincode is 6 digits long
+    return /^\d{6}$/.test(pincode);
+  };
+
+  // Handle form data changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -106,51 +97,91 @@ const UploadVehicle = ({ userId }) => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  // Handle form submission
+// Handle form submission
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    if (!pincodeValid) {
-      setError('Invalid Pincode');
-      setLoading(false);
-      return;
+  if (!pincodeValid) {
+    setError('Invalid Pincode');
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const db = getFirestore();
+    const storage = getStorage();
+
+    // Prepare vehicle data without the image
+    const { image, ...restFormData } = formData;
+    const vehicleData = {
+      ...restFormData, // Exclude image here
+      userId,
+      userFullName,
+      createdAt: serverTimestamp(),
+    };
+
+    // Upload image to Firebase Storage if an image is provided
+    if (image) {
+      // Use the specified path format 'vehicles/${image.name}'
+      const storageRef = ref(storage, `vehicles/${image.name}`);
+      const snapshot = await uploadBytes(storageRef, image);
+      const imageUrl = await getDownloadURL(snapshot.ref);  // Get the image URL
+
+      // Include the imageUrl in the vehicleData
+      vehicleData.imageUrl = imageUrl;
     }
 
-    try {
-      const db = getFirestore();
-      const storage = getStorage();
+    // Function to add vehicle to the group's marketplace
+    const addToGroupMarketplace = async (groupId) => {
+      const groupMarketplaceRef = collection(db, 'groups', groupId, 'marketplace');
+      // Add vehicle to the group's marketplace subcollection
+      await addDoc(groupMarketplaceRef, vehicleData);
+    };
 
-      // Upload image to Firebase Storage
-      let imageUrl = null;
-      if (formData.image) {
-        const storageRef = ref(storage, `vehicles/${userId}/${formData.image.name}`);
-        const snapshot = await uploadBytes(storageRef, formData.image);
-        imageUrl = await getDownloadURL(snapshot.ref);
+    // Upload to selected groups
+    if (formData.selectedGroups.length > 0) {
+      for (const groupId of formData.selectedGroups) {
+        await addToGroupMarketplace(groupId);
       }
-
-      // Add vehicle details to Firestore
-      const vehicleData = {
-        ...formData,
-        userId,
-        imageUrl,
-        userFullName,
-      };
-      await addDoc(collection(db, 'vehicles'), vehicleData);
-      
-      router.push('/marketplace');
-    } catch (error) {
-      setError('Error uploading vehicle');
-      console.error(error);
-    } finally {
-      setLoading(false);
     }
-  };
+
+    // Upload to global marketplace if checked
+    if (formData.addToMarketplace) {
+      const marketplaceRef = collection(db, 'marketplace');
+      await addDoc(marketplaceRef, vehicleData);
+    }
+
+    // If the vehicle is put for sale, upload it to a 'vehiclesForSale' collection
+    if (formData.putForSale && formData.price) {
+      const forSaleData = { ...vehicleData, price: formData.price };
+      const forSaleRef = collection(db, 'vehiclesForSale');
+      await addDoc(forSaleRef, forSaleData);
+    }
+
+    router.push('/marketPlace');
+  } catch (error) {
+    setError('Error uploading vehicle');
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  
+  
+
+
+
 
   return (
     <div className="bg-white rounded-lg p-8 shadow-lg">
       <h2 className="text-2xl font-bold mb-6">Upload Your Vehicle</h2>
       <form onSubmit={handleSubmit}>
+        {/* Form Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Vehicle Type */}
           <div className="form-group">
             <label className="block font-semibold mb-1">Vehicle Type</label>
             <select
@@ -164,6 +195,7 @@ const UploadVehicle = ({ userId }) => {
             </select>
           </div>
 
+          {/* Manufacturer, Model, Year */}
           <div className="form-group">
             <label className="block font-semibold mb-1">Manufacturer</label>
             <input
@@ -191,7 +223,7 @@ const UploadVehicle = ({ userId }) => {
           <div className="form-group">
             <label className="block font-semibold mb-1">Year</label>
             <input
-              type="text"
+              type="number"
               name="year"
               value={formData.year}
               onChange={handleChange}
@@ -200,6 +232,7 @@ const UploadVehicle = ({ userId }) => {
             />
           </div>
 
+          {/* Address */}
           <div className="form-group">
             <label className="block font-semibold mb-1">Address Line 1</label>
             <input
@@ -237,19 +270,17 @@ const UploadVehicle = ({ userId }) => {
 
           <div className="form-group">
             <label className="block font-semibold mb-1">State</label>
-            <select
+            <input
+              type="text"
               name="state"
               value={formData.state}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded"
               required
-            >
-              {indianStates.map((state) => (
-                <option key={state} value={state}>{state}</option>
-              ))}
-            </select>
+            />
           </div>
 
+          {/* Pincode */}
           <div className="form-group">
             <label className="block font-semibold mb-1">Pincode</label>
             <input
@@ -257,86 +288,103 @@ const UploadVehicle = ({ userId }) => {
               name="pincode"
               value={formData.pincode}
               onChange={handlePincodeChange}
-              className={`w-full p-2 border border-gray-300 rounded ${pincodeValid ? '' : 'border-red-500'}`}
+              className="w-full p-2 border border-gray-300 rounded"
               required
             />
             {!pincodeValid && (
               <span className="text-red-500 text-sm">Invalid Pincode</span>
             )}
           </div>
-        </div>
 
-        <div className="form-group mt-4">
-          <label className="block font-semibold mb-1">Vehicle Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="w-full p-2 border border-gray-300 rounded"
-            required
-          />
-        </div>
-
-        <div className="form-group mt-4">
-          <label className="block font-semibold mb-1">Select Groups to Share With</label>
-          <div className="grid grid-cols-2 gap-2">
-            {groups.length > 0 ? (
-              groups.map(group => (
-                <label key={group.id} className="inline-flex items-center">
-                  <input
-                    type="checkbox"
-                    value={group.id}
-                    checked={formData.selectedGroups.includes(group.id)}
-                    onChange={() => handleGroupSelection(group.id)}
-                    className="form-checkbox"
-                  />
-                  <span className="ml-2">{group.groupName}</span>
-                </label>
-              ))
-            ) : (
-              <p>No groups found</p>
-            )}
+          {/* Image Upload */}
+          <div className="form-group">
+            <label className="block font-semibold mb-1">Upload Image</label>
+            <input
+              type="file"
+              onChange={handleFileChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
           </div>
         </div>
 
-        <div className="form-group mt-4">
-          <label className="inline-flex items-center">
-            <input
-              type="checkbox"
-              name="addToMarketplace"
-              checked={formData.addToMarketplace}
-              onChange={(e) => setFormData({ ...formData, addToMarketplace: e.target.checked })}
-              className="form-checkbox"
-            />
-            <span className="ml-2">Add to Marketplace</span>
-          </label>
+        {/* Group Selection */}
+        <div className="form-group">
+          <label className="block font-semibold mb-1">Select Groups</label>
+          {groups.length > 0 ? (
+            groups.map((group) => (
+              <div key={group.id}>
+                <input
+                  type="checkbox"
+                  value={group.id}
+                  checked={formData.selectedGroups.includes(group.id)}
+                  onChange={() => handleGroupSelection(group.id)}
+                />
+                <label className="ml-2">{group.name}</label>
+              </div>
+            ))
+          ) : (
+            <p>No groups available</p>
+          )}
         </div>
 
-        {formData.addToMarketplace && (
-          <div className="form-group mt-4">
-            <label className="block font-semibold mb-1">Price (in INR)</label>
+        {/* Add to Marketplace */}
+        <div className="form-group">
+          <label className="block font-semibold mb-1">Add to Marketplace</label>
+          <input
+            type="checkbox"
+            name="addToMarketplace"
+            checked={formData.addToMarketplace}
+            onChange={(e) =>
+              setFormData((prevData) => ({
+                ...prevData,
+                addToMarketplace: e.target.checked,
+              }))
+            }
+          />
+        </div>
+
+        {/* Put for Sale */}
+        <div className="form-group">
+          <label className="block font-semibold mb-1">Put for Sale</label>
+          <input
+            type="checkbox"
+            name="putForSale"
+            checked={formData.putForSale}
+            onChange={(e) =>
+              setFormData((prevData) => ({
+                ...prevData,
+                putForSale: e.target.checked,
+              }))
+            }
+          />
+        </div>
+
+        {/* Price (for sale) */}
+        {formData.putForSale && (
+          <div className="form-group">
+            <label className="block font-semibold mb-1">Price</label>
             <input
-              type="text"
+              type="number"
               name="price"
               value={formData.price}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded"
-              required
+              required={formData.putForSale}
             />
           </div>
         )}
 
-        {error && (
-          <div className="text-red-500 mt-4">{error}</div>
-        )}
-
+        {/* Submit Button */}
         <button
           type="submit"
-          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mt-4"
+          className="mt-4 bg-blue-500 text-white p-2 rounded-lg"
           disabled={loading}
         >
           {loading ? 'Uploading...' : 'Upload Vehicle'}
         </button>
+
+        {/* Error Message */}
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </form>
     </div>
   );
