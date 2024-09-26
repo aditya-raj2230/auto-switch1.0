@@ -16,10 +16,10 @@ const secondaryColor = "bg-gray-200";
 
 const websiteFeatures = [
   { name: "Chat", description: "Connect with friends and community.", link: "/chat", icon: "💬" }, 
-  { name: "Marketplace", description: "Buy or sell vehicles in the community.", link: "/marketplace", icon: "🚗" },
+  { name: "Marketplace", description: "Buy or sell vehicles in the community.", link: "/marketPlace", icon: "🚗" },
   { name: "Add Friends", description: "Find and add new friends.", link: "/addFriends", icon: "🤝" }, 
   { name: "Explore", description: "Discover groups and universities.", link: "/explore", icon: "🌍" }, 
-  { name: "Profile", description: "View and edit your profile.", link: "/profile", icon: "🧑‍💼" }, 
+  { name: "Profile", description: "View and edit your profile.", link: "/", icon: "🧑‍💼" }, 
 ];
 
 const Page = () => {
