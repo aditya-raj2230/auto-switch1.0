@@ -1,4 +1,3 @@
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import Navbar2 from "@/components/Navbar2";
@@ -6,8 +5,6 @@ import { AuthProvider } from "./context/AuthContext";
 import { FollowProvider } from "./context/FollowContext";
 import Link from "next/link";
 import Image from "next/image";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Create Next App",
@@ -17,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <AuthProvider>
           <FollowProvider>
             {/* Fixed Logo Image for Small Screens */}
@@ -32,18 +29,18 @@ export default function RootLayout({ children }) {
                 />
               </Link>
             </div>
-            
+
             <div className="flex md:flex-col min-h-screen flex-col-reverse">
               {/* Navbar for Medium Screens and Up */}
               <div className="fixed top-0 left-0 w-full md:block hidden z-30 bg-white ">
                 <Navbar2 />
               </div>
-              
+
               {/* Main Content */}
               <main className="relative overflow-hidden flex-1 pt-[104px] md:pt-[76px]">
                 {children}
               </main>
-              
+
               {/* Navbar for Mobile */}
               <div className="block md:hidden fixed bottom-0 w-full z-50 bg-white">
                 <Navbar2 />
