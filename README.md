@@ -1,3 +1,4 @@
+https://auto-switch1-0.vercel.app/ check out the web site here, the dummy credentials are: ms22172@iisermohali.ac.in and password: 17025nined
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
